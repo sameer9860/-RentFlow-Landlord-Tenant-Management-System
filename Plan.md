@@ -40,6 +40,45 @@ Signals: Auto-create profile when user is created.
 
 Admin: Customize to show role, phone, address.
 
+Means  Accounts App (User & Roles)
+
+We need role-based system.
+
+Extend User with Profile
+
+Create Profile model:
+
+OneToOne to User
+
+role (LANDLORD / TENANT)
+
+phone
+
+address
+
+Why?
+
+👉 Never modify Django’s User directly. Always extend.
+
+ Create Signal to Auto-Create Profile
+
+Create signals.py inside accounts:
+
+When user is created → automatically create profile.
+
+Connect signals in apps.py.
+
+Admin Customization
+
+In admin.py:
+
+Show role in list display
+
+Add filters
+
+Make it professional
+
+
 # 🏢 Step 3: Properties App
 Goal: Manage properties, rooms, and tenancies.
 
