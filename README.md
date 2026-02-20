@@ -46,14 +46,14 @@ To get started with RentFlow locally, follow these steps:
 
    ```bash
    git clone https://github.com/sameer9860/-RentFlow-Landlord-Tenant-Management-System.git
-   cd -RentFlow-Landlord-Tenant-Management-System
+   cd Landlord–Tenant Management System
    ```
 
 2. **Set up a virtual environment:**
 
    ```bash
    python3 -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate(Linux/Mac)  or  venv\Scripts\activate(Windows)
    ```
 
 3. **Install dependencies:**
@@ -93,4 +93,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-_Developed by [Sameer](https://github.com/sameer9860)_
+_Developed by [Sameer khatiwada](https://github.com/sameer9860)_
