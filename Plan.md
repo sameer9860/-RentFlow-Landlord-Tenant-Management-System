@@ -108,6 +108,73 @@ class Tenancy(models.Model):
     is_active = models.BooleanField(default=True)
 Admin: Inline rooms under properties, inline tenancies under rooms.
 
+Means— Property Management
+✅  Create Property Model
+
+Fields:
+
+landlord (FK User)
+
+name
+
+address
+
+description
+
+created_at
+
+Relationship:
+One landlord → many properties
+
+✅ Create Room Model
+
+Fields:
+
+property (FK)
+
+room_number
+
+monthly_rent
+
+capacity
+
+is_active
+
+created_at
+
+Do NOT store is_occupied here directly.
+
+Why?
+
+Because occupancy should depend on active tenancy.
+
+Better design.
+
+✅ Create Tenancy Model (Very Important)
+
+This is the professional way.
+
+Fields:
+
+tenant (FK User)
+
+room (FK)
+
+start_date
+
+end_date
+
+is_active
+
+Why this model?
+
+✅ Track history
+✅ Change tenants
+✅ Keep records
+✅ No data loss
+
+Without Tenancy model → your system becomes weak.
+
 # 💰 Step 4: Payments App
 Goal: Track invoices and payments.
 
