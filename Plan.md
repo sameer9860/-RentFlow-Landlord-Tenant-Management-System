@@ -196,6 +196,8 @@ class Payment(models.Model):
     payment_date = models.DateTimeField(auto_now_add=True)
     method = models.CharField(max_length=20, choices=[('CASH','Cash'),('ONLINE','Online'),('BANK','Bank'),('ESEWA','eSewa')])
     transaction_id = models.CharField(max_length=50, blank=True, null=True)
+
+    
 📊 Step 5: Dashboard App
 Goal: Landlord & Tenant dashboards with stats.
 
