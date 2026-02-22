@@ -196,7 +196,43 @@ class Payment(models.Model):
     payment_date = models.DateTimeField(auto_now_add=True)
     method = models.CharField(max_length=20, choices=[('CASH','Cash'),('ONLINE','Online'),('BANK','Bank'),('ESEWA','eSewa')])
     transaction_id = models.CharField(max_length=50, blank=True, null=True)
+Means   Payment System
+ Create RentInvoice Model
 
+Fields:
+
+tenancy (FK)
+
+month
+
+year
+
+amount
+
+due_date
+
+status (Pending / Paid / Late)
+
+generated_at
+
+Add unique constraint:
+One invoice per tenancy per month/year.
+
+Create Payment Model
+
+Fields:
+
+invoice (FK)
+
+paid_amount
+
+payment_date
+
+method
+
+transaction_id
+
+Allow multiple payments per invoice.
     
 📊 Step 5: Dashboard App
 Goal: Landlord & Tenant dashboards with stats.
