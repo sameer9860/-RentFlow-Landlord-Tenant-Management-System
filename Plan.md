@@ -234,7 +234,7 @@ transaction_id
 
 Allow multiple payments per invoice.
     
-📊 Step 5: Dashboard App
+# Step 5: Dashboard App
 Goal: Landlord & Tenant dashboards with stats.
 
 Landlord Dashboard:
