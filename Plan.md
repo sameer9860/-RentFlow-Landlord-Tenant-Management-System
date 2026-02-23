@@ -1,9 +1,11 @@
 #Landlord–Tenant Management System Plan
+
 # 🏗 Step 1: Project & App Setup
+
 Create Django project:
 
 bash
-django-admin startproject config                
+django-admin startproject config  
 cd config
 Create apps:
 
@@ -16,6 +18,7 @@ python manage.py startapp core
 Add all apps to INSTALLED_APPS in config/settings.py.
 
 # 🧑 Step 2: Accounts App
+
 Goal: Extend Django’s User with a Profile model for roles.
 
 accounts/models.py:
@@ -25,22 +28,23 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Profile(models.Model):
-    ROLE_CHOICES = (
-        ('LANDLORD', 'Landlord'),
-        ('TENANT', 'Tenant'),
-    )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    phone = models.CharField(max_length=15)
-    address = models.TextField()
+ROLE_CHOICES = (
+('LANDLORD', 'Landlord'),
+('TENANT', 'Tenant'),
+)
+user = models.OneToOneField(User, on_delete=models.CASCADE)
+role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+phone = models.CharField(max_length=15)
+address = models.TextField()
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
+
 Signals: Auto-create profile when user is created.
 
 Admin: Customize to show role, phone, address.
 
-Means  Accounts App (User & Roles)
+Means Accounts App (User & Roles)
 
 We need role-based system.
 
@@ -60,7 +64,7 @@ Why?
 
 👉 Never modify Django’s User directly. Always extend.
 
- Create Signal to Auto-Create Profile
+Create Signal to Auto-Create Profile
 
 Create signals.py inside accounts:
 
@@ -78,38 +82,38 @@ Add filters
 
 Make it professional
 
-
 # 🏢 Step 3: Properties App
+
 Goal: Manage properties, rooms, and tenancies.
 
 properties/models.py:
 
 python
 class Property(models.Model):
-    landlord = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    address = models.TextField()
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+landlord = models.ForeignKey(User, on_delete=models.CASCADE)
+name = models.CharField(max_length=100)
+address = models.TextField()
+description = models.TextField(blank=True)
+created_at = models.DateTimeField(auto_now_add=True)
 
 class Room(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
-    room_number = models.CharField(max_length=10)
-    monthly_rent = models.DecimalField(max_digits=10, decimal_places=2)
-    is_occupied = models.BooleanField(default=False)
-    capacity = models.IntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
+property = models.ForeignKey(Property, on_delete=models.CASCADE)
+room_number = models.CharField(max_length=10)
+monthly_rent = models.DecimalField(max_digits=10, decimal_places=2)
+is_occupied = models.BooleanField(default=False)
+capacity = models.IntegerField(default=1)
+created_at = models.DateTimeField(auto_now_add=True)
 
 class Tenancy(models.Model):
-    tenant = models.ForeignKey(User, on_delete=models.CASCADE)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    end_date = models.DateField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+tenant = models.ForeignKey(User, on_delete=models.CASCADE)
+room = models.ForeignKey(Room, on_delete=models.CASCADE)
+start_date = models.DateField()
+end_date = models.DateField(null=True, blank=True)
+is_active = models.BooleanField(default=True)
 Admin: Inline rooms under properties, inline tenancies under rooms.
 
 Means— Property Management
-✅  Create Property Model
+✅ Create Property Model
 
 Fields:
 
@@ -176,28 +180,29 @@ Why this model?
 Without Tenancy model → your system becomes weak.
 
 # 💰 Step 4: Payments App
+
 Goal: Track invoices and payments.
 
 payments/models.py:
 
 python
 class RentInvoice(models.Model):
-    tenancy = models.ForeignKey('properties.Tenancy', on_delete=models.CASCADE)
-    month = models.IntegerField()
-    year = models.IntegerField()
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    due_date = models.DateField()
-    status = models.CharField(max_length=10, choices=[('PENDING','Pending'),('PAID','Paid'),('LATE','Late')])
-    generated_at = models.DateTimeField(auto_now_add=True)
+tenancy = models.ForeignKey('properties.Tenancy', on_delete=models.CASCADE)
+month = models.IntegerField()
+year = models.IntegerField()
+amount = models.DecimalField(max_digits=10, decimal_places=2)
+due_date = models.DateField()
+status = models.CharField(max_length=10, choices=[('PENDING','Pending'),('PAID','Paid'),('LATE','Late')])
+generated_at = models.DateTimeField(auto_now_add=True)
 
 class Payment(models.Model):
-    invoice = models.ForeignKey(RentInvoice, on_delete=models.CASCADE)
-    paid_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_date = models.DateTimeField(auto_now_add=True)
-    method = models.CharField(max_length=20, choices=[('CASH','Cash'),('ONLINE','Online'),('BANK','Bank'),('ESEWA','eSewa')])
-    transaction_id = models.CharField(max_length=50, blank=True, null=True)
-Means   Payment System
- Create RentInvoice Model
+invoice = models.ForeignKey(RentInvoice, on_delete=models.CASCADE)
+paid_amount = models.DecimalField(max_digits=10, decimal_places=2)
+payment_date = models.DateTimeField(auto_now_add=True)
+method = models.CharField(max_length=20, choices=[('CASH','Cash'),('ONLINE','Online'),('BANK','Bank'),('ESEWA','eSewa')])
+transaction_id = models.CharField(max_length=50, blank=True, null=True)
+Means Payment System
+Create RentInvoice Model
 
 Fields:
 
@@ -233,72 +238,180 @@ method
 transaction_id
 
 Allow multiple payments per invoice.
-    
-# Step 5: Dashboard App
-Goal: Landlord & Tenant dashboards with stats.
 
-Landlord Dashboard:
+# step 5-Business Logic
 
-Total properties, rooms, occupancy rate.
+Now we add intelligence.
 
-Expected rent vs collected vs pending.
+✅ Auto Generate Monthly Invoices
 
-Tenant Dashboard:
+Create:
 
-Current rent, next due date, outstanding balance.
-
-Payment history.
-
-Use QuerySet annotations for calculations:
-
-python
-from django.db.models import Sum, Count
-
-occupied = Room.objects.filter(is_occupied=True).count()
-vacant = Room.objects.filter(is_occupied=False).count()
-expected_rent = Room.objects.aggregate(Sum('monthly_rent'))
-⚙️ Step 6: Automatic Invoice Generation
-Option 1: Django management command (run via cron).
-
-Option 2: Celery + Redis (production-ready).
+payments/management/commands/generate_invoices.py
 
 Logic:
 
-On 1st of each month, loop through active tenancies.
+Find all active tenancies
 
-Generate RentInvoice with due date = 7th of month.
+Create invoice if not exists for current month
 
-🛡 Step 7: Admin Customization
-Show inline relationships (rooms under property, payments under invoice).
+Run monthly using:
 
-Add filters for landlord, tenant, status.
+cron job (Linux)
 
-Use list_display for quick stats.
+Windows Task Scheduler
 
-📈 Step 8: Scalability & SaaS Features
-Add subscription plans for landlords.
+Celery (production way)
 
-Integrate Stripe/eSewa for online payments.
+✅ Auto Update Status
 
-Add email/SMS reminders.
+Add model method:
 
-Generate PDF invoices with reportlab or xhtml2pdf.
+If today > due_date AND status != Paid → mark as Late.
 
-Export reports in CSV/Excel.
+You can override save() or create a utility function.
 
-✅ Step-by-Step Execution Plan
-Setup project & apps → accounts, properties, payments, dashboard, core.
+# step 6-Dashboard
 
-Build models → Start with accounts.Profile, then Property, Room, Tenancy, then RentInvoice & Payment.
+✅ Landlord Dashboard Stats
 
-Migrate & test in Admin → Ensure CRUD works.
+Use Django ORM:
 
-Add dashboards → Landlord stats, tenant views.
+Total Properties
 
-Implement invoice generation → Management command first, Celery later.
+Total Rooms
 
-Enhance admin → Filters, inlines, stats.
+Active Tenancies
 
-Add payment integration → Start with manual entry, later integrate APIs.
+Vacant Rooms
 
-Deploy & scale → PostgreSQL, SaaS features.
+Expected Monthly Income
+
+Collected Income
+
+Pending Income
+
+Occupancy Rate
+
+Use:
+
+annotate()
+aggregate()
+Count()
+Sum()
+
+This makes it professional.
+
+✅ Tenant Dashboard
+
+Show:
+
+Current room
+
+Monthly rent
+
+Next due date
+
+Payment history
+
+Outstanding balance
+
+Filter by logged-in user.
+
+# step 7-Frontend
+
+✅ Use Django Templates + Bootstrap
+
+Create:
+
+base.html
+
+landlord_dashboard.html
+
+tenant_dashboard.html
+
+property_list.html
+
+room_list.html
+
+invoice_list.html
+
+Keep UI simple but clean.
+
+# step 8-Permissions
+
+✅ Restrict Access by Role
+
+Create decorator or mixin:
+
+Only landlord → property management
+
+Only tenant → payment view
+
+Use:
+
+UserPassesTestMixin
+LoginRequiredMixin
+
+# step 9-Optimization
+
+✅ Add Indexes
+
+Add database indexes to:
+
+month
+
+year
+
+status
+
+landlord
+
+tenancy
+
+This improves performance.
+
+✅ Add select_related & prefetch_related
+
+Example:
+
+Tenancy.objects.select_related('tenant', 'room')
+
+Avoid N+1 queries.
+
+# step 10-Advanced Features
+
+After MVP works:
+
+🔹 Add Email Reminder
+
+Send reminder 3 days before due date.
+
+🔹 Add eSewa Integration
+
+Since you're in Nepal, integrate sandbox payment.
+
+🔹 Add Reports Export (CSV/Excel)
+🔹 Add REST API using Django REST Framework
+
+🏁 Final Development Order (Correct Order)
+
+Setup project
+
+Create accounts app
+
+Create properties app
+
+Create tenancy system
+
+Create payment system
+
+Add business logic
+
+Build dashboards
+
+Add permissions
+
+Optimize queries
+
+Add automation
