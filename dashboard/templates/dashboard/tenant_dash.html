@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tenant Dashboard</title>
+</head>
+
+<body>
+    <h1>Tenant Dashboard</h1>
+    {% if tenancy %}
+    <div>
+        <h3>Current Room: {{ tenancy.room.room_number }}</h3>
+        <h3>Monthly Rent: {{ tenancy.room.monthly_rent }}</h3>
+        <h3>Outstanding Balance: {{ outstanding_balance }}</h3>
+    </div>
+    <hr>
+    <h3>Invoices</h3>
+    <ul>
+        {% for invoice in invoices %}
+        <li>{{ invoice.month }}/{{ invoice.year }} - {{ invoice.amount }} ({{ invoice.status }})</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No active tenancy found.</p>
+    {% endif %}
+</body>
+
+</html>
