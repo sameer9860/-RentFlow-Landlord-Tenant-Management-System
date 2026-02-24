@@ -16,7 +16,7 @@ class LandlordDashboardView(LoginRequiredMixin, TemplateView):
         context['total_properties'] = Property.objects.filter(landlord=user).count()
         context['total_rooms'] = Room.objects.filter(property__landlord=user).count()
         context['active_tenancies'] = Tenancy.objects.filter(room__property__landlord=user, is_active=True).count()
-        context['vacant_rooms'] = Room.objects.filter(property__landlord=user, is_occupied=False).count()
+        context['vacant_rooms'] = context['total_rooms'] - context['active_tenancies']
         
         # Financials
         all_invoices = RentInvoice.objects.filter(tenancy__room__property__landlord=user)
