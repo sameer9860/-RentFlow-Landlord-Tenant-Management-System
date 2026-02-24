@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Landlord Dashboard</title>
+</head>
+<body>
+    <h1>Landlord Dashboard</h1>
+    <div>
+        <h3>Properties: {{ total_properties }}</h3>
+        <h3>Total Rooms: {{ total_rooms }}</h3>
+        <h3>Active Tenancies: {{ active_tenancies }}</h3>
+        <h3>Vacant Rooms: {{ vacant_rooms }}</h3>
+        <h3>Occupancy Rate: {{ occupancy_rate|floatformat:2 }}%</h3>
+    </div>
+    <hr>
+    <div>
+        <h3>Expected Income: {{ expected_income }}</h3>
+        <h3>Collected Income: {{ collected_income }}</h3>
+        <h3>Pending Income: {{ pending_income }}</h3>
+    </div>
+</body>
+</html>
