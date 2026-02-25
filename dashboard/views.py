@@ -26,10 +26,14 @@ class LandlordDashboardView(LoginRequiredMixin, TemplateView):
         context['collected_income'] = collected
         context['pending_income'] = context['expected_income'] - collected
         
+        total_rooms = context['total_rooms']
+        active = context['active_tenancies']
+
         if context['total_rooms'] > 0:
-            context['occupancy_rate'] = (context['active_tenancies'] / context['total_rooms']) * 100
+            occupancy = (context['active_tenancies'] / context['total_rooms']) * 100
+            context['occupancy_rate'] = round(occupancy, 2)
         else:
-            context['occupancy_rate'] = 0
+            context['occupancy_rate'] = 0.0
             
         return context
 
