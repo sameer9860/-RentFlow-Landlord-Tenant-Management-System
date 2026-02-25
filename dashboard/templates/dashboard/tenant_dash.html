@@ -1,28 +1,93 @@
-<!DOCTYPE html>
-<html>
+{% extends 'core/base.html' %}
 
-<head>
-    <title>Tenant Dashboard</title>
-</head>
+{% block title %}My Dashboard - RentFlow{% endblock %}
 
-<body>
-    <h1>Tenant Dashboard</h1>
-    {% if tenancy %}
-    <div>
-        <h3>Current Room: {{ tenancy.room.room_number }}</h3>
-        <h3>Monthly Rent: {{ tenancy.room.monthly_rent }}</h3>
-        <h3>Outstanding Balance: {{ outstanding_balance }}</h3>
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Tenant Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0 text-muted">
+        Welcome, {{ user.username }}
     </div>
-    <hr>
-    <h3>Invoices</h3>
-    <ul>
-        {% for invoice in invoices %}
-        <li>{{ invoice.month }}/{{ invoice.year }} - {{ invoice.amount }} ({{ invoice.status }})</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No active tenancy found.</p>
-    {% endif %}
-</body>
+</div>
 
-</html>
+{% if tenancy %}
+<div class="row">
+    <!-- Current Accommodation -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Current Accommodation</h6>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-home fa-5x text-primary mb-3"></i>
+                        <h5>Room {{ tenancy.room.room_number }}</h5>
+                        <p class="text-muted">{{ tenancy.room.property.name }}</p>
+                    </div>
+                    <div class="col-md-8 border-start">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Monthly Rent <span><strong>NPR {{ tenancy.room.monthly_rent }}</strong></span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Start Date <span>{{ tenancy.start_date }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center text-danger">
+                                Outstanding Balance <span><strong>NPR {{ outstanding_balance }}</strong></span>
+                            </li>
+                        </ul>
+                        <div class="d-grid mt-3">
+                            <a href="{% url 'payments:invoice_list' %}" class="btn btn-primary">Pay Outstanding
+                                Balance</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats/Actions -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 mb-4 bg-light">
+            <div class="card-body">
+                <h6>Need Help?</h6>
+                <p class="small text-muted">Contact your landlord for maintenance or disputes.</p>
+                <button class="btn btn-sm btn-outline-secondary w-100">Raise Ticket</button>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Recent Invoices</h6>
+                <ul class="list-unstyled mb-0">
+                    {% for invoice in invoices|slice:":3" %}
+                    <li class="mb-2 pb-2 border-bottom">
+                        <div class="d-flex justify-content-between small">
+                            <span>{{ invoice.month }}/{{ invoice.year }}</span>
+                            <span
+                                class="badge {% if invoice.status == 'PAID' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                {{ invoice.status }}
+                            </span>
+                        </div>
+                        <div class="text-primary fw-bold">NPR {{ invoice.amount }}</div>
+                    </li>
+                    {% empty %}
+                    <li class="text-muted small">No invoices yet.</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'payments:invoice_list' %}" class="small text-decoration-none mt-2 d-block">View All
+                    Invoices</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info py-5 text-center">
+    <i class="fas fa-info-circle fa-3x mb-3 text-info"></i>
+    <h4>No active tenancy found!</h4>
+    <p class="mb-0">You are currently not assigned to any room. Please contact the landlord or administrator.</p>
+</div>
+{% endif %}
+
+{% endblock %}
