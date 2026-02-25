@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Properties - RentFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">My Properties</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="#" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i>Add Property</a>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for property in properties %}
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ property.name }}</h5>
+                <p class="card-text text-muted small"><i class="fas fa-map-marker-alt me-1"></i>{{ property.address }}
+                </p>
+                <p class="card-text">{{ property.description|truncatewords:20 }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-info text-dark">{{ property.rooms.count }} Rooms</span>
+                    <a href="{% url 'properties:room_list' %}?property={{ property.id }}"
+                        class="btn btn-sm btn-link">View Rooms</a>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <div class="d-grid">
+                    <a href="#" class="btn btn-sm btn-outline-secondary">Edit Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning">No properties found. <a href="#">Create your first property!</a></div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
