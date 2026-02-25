@@ -56,13 +56,12 @@
                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Occupancy Rate</div>
                         <div class="row no-gutters align-items-center">
                             <div class="col-auto">
-                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ occupancy_rate|floatformat:1
-                                    }}%</div>
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ occupancy_rate }}%</div>
                             </div>
                             <div class="col">
                                 <div class="progress progress-sm mr-2">
                                     <div class="progress-bar bg-info" role="progressbar"
-                                        style="width: {{ occupancy_rate }}%" aria-valuenow="{{ occupancy_rate }}"
+                                        style="width: {{ occupancy_rate|default:0 }}%" aria-valuenow="{{ occupancy_rate|default:0 }}"
                                         aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>
