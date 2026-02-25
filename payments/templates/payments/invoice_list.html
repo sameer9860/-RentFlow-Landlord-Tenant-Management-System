@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Invoices - RentFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Invoices</h1>
+    {% if user.profile.role == 'LANDLORD' %}
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <form action="#" method="post" class="me-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-sync me-1"></i>Generate
+                Invoices</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<div class="bg-white p-3 rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Invoice ID</th>
+                    <th>{% if user.profile.role == 'LANDLORD' %}Tenant{% else %}Room{% endif %}</th>
+                    <th>Month/Year</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>#{{ invoice.id }}</td>
+                    <td>
+                        {% if user.profile.role == 'LANDLORD' %}
+                        {{ invoice.tenancy.tenant.username }}
+                        {% else %}
+                        {{ invoice.tenancy.room.room_number }}
+                        {% endif %}
+                    </td>
+                    <td>{{ invoice.month }}/{{ invoice.year }}</td>
+                    <td>NPR {{ invoice.amount }}</td>
+                    <td>{{ invoice.due_date }}</td>
+                    <td>
+                        {% if invoice.status == 'PAID' %}
+                        <span class="badge bg-success">Paid</span>
+                        {% elif invoice.status == 'LATE' %}
+                        <span class="badge bg-danger">Late</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="#" class="btn btn-outline-info" title="View PDF"><i
+                                    class="fas fa-file-pdf"></i></a>
+                            {% if user.profile.role == 'TENANT' and invoice.status != 'PAID' %}
+                            <a href="#" class="btn btn-success" title="Pay Now"><i
+                                    class="fas fa-credit-card me-1"></i>Pay</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">No invoices found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
