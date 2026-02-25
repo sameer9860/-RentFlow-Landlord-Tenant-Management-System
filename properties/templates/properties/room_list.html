@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Rooms - RentFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">All Rooms</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="#" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i>Add Room</a>
+    </div>
+</div>
+
+<div class="table-responsive bg-white p-3 rounded shadow-sm">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Room #</th>
+                <th>Property</th>
+                <th>Monthly Rent</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+            <tr>
+                <td><strong>{{ room.room_number }}</strong></td>
+                <td>{{ room.property.name }}</td>
+                <td>NPR {{ room.monthly_rent }}</td>
+                <td>{{ room.capacity }}</td>
+                <td>
+                    {% if room.is_active %}
+                    {% if room.tenancies.filter.is_active.exists %}
+                    <span class="badge bg-danger">Occupied</span>
+                    {% else %}
+                    <span class="badge bg-success">Vacant</span>
+                    {% endif %}
+                    {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="#" class="btn btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="#" class="btn btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-4 text-muted">No rooms available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
