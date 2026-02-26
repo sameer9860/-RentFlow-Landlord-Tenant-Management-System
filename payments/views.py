@@ -1,9 +1,13 @@
 from django.shortcuts import render
 from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import RentInvoice
 
-class InvoiceListView(LoginRequiredMixin, ListView):
+class ProfileRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and hasattr(self.request.user, 'profile')
+
+class InvoiceListView(ProfileRequiredMixin, ListView):
     model = RentInvoice
     template_name = 'payments/invoice_list.html'
     context_object_name = 'invoices'
