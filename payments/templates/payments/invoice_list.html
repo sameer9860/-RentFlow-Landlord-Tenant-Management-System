@@ -7,7 +7,7 @@
     <h1 class="h2">Invoices</h1>
     {% if user.profile.role == 'LANDLORD' %}
     <div class="btn-toolbar mb-2 mb-md-0">
-        <form action="#" method="post" class="me-2">
+        <form action="{% url 'payments:generate_invoices' %}" method="post" class="me-2">
             {% csrf_token %}
             <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-sync me-1"></i>Generate
                 Invoices</button>
