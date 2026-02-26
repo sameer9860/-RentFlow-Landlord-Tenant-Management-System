@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from core.mixins import LandlordRequiredMixin
 from .models import Property, Room
 
-class PropertyListView(LoginRequiredMixin, ListView):
+class PropertyListView(LandlordRequiredMixin, ListView):
     model = Property
     template_name = 'properties/property_list.html'
     context_object_name = 'properties'
@@ -11,7 +12,7 @@ class PropertyListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Property.objects.filter(landlord=self.request.user)
 
-class RoomListView(LoginRequiredMixin, ListView):
+class RoomListView(LandlordRequiredMixin, ListView):
     model = Room
     template_name = 'properties/room_list.html'
     context_object_name = 'rooms'
