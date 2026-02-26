@@ -2,10 +2,11 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum, Count, Q
+from core.mixins import LandlordRequiredMixin, TenantRequiredMixin
 from properties.models import Property, Room, Tenancy
 from payments.models import RentInvoice, Payment
 
-class LandlordDashboardView(LoginRequiredMixin, TemplateView):
+class LandlordDashboardView(LandlordRequiredMixin, TemplateView):
     template_name = 'dashboard/landlord_dash.html'
 
     def get_context_data(self, **kwargs):
@@ -37,7 +38,7 @@ class LandlordDashboardView(LoginRequiredMixin, TemplateView):
             
         return context
 
-class TenantDashboardView(LoginRequiredMixin, TemplateView):
+class TenantDashboardView(TenantRequiredMixin, TemplateView):
     template_name = 'dashboard/tenant_dash.html'
 
     def get_context_data(self, **kwargs):
