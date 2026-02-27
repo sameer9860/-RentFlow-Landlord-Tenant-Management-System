@@ -7,7 +7,7 @@
     <h1 class="h2">All Rooms</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="{% url 'properties:room_add' %}" class="btn btn-sm btn-outline-primary"><i
-                class="fas fa-plus me-1"></i>Add Room</a>
+                class="fa-solid fa-plus me-1"></i>Add Room</a>
     </div>
 </div>
 
@@ -32,7 +32,7 @@
                 <td>{{ room.capacity }}</td>
                 <td>
                     {% if room.is_active %}
-                    {% if room.tenancies.filter.is_active.exists %}
+                    {% if room.is_occupied %}
                     <span class="badge bg-danger">Occupied</span>
                     {% else %}
                     <span class="badge bg-success">Vacant</span>
@@ -43,8 +43,9 @@
                 </td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <a href="#" class="btn btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
-                        <a href="#" class="btn btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></a>
+                        <a href="#" class="btn btn-outline-primary" title="Edit"><i
+                                class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="#" class="btn btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></a>
                     </div>
                 </td>
             </tr>
