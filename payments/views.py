@@ -56,3 +56,35 @@ class GenerateInvoicesView(LandlordRequiredMixin, View):
             messages.info(request, f"No new invoices to generate for {month}/{year}.")
             
         return redirect('payments:invoice_list')
+
+class MarkInvoicePaidView(LandlordRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        invoice = RentInvoice.objects.filter(
+            pk=pk,
+            tenancy__room__property__landlord=request.user
+        ).first()
+        if invoice:
+            invoice.status = 'PAID'
+            invoice.save()
+            messages.success(request, f"Invoice #{invoice.id} marked as paid.")
+        else:
+            messages.error(request, "Invoice not found or access denied.")
+        return redirect('payments:invoice_list')
+
+class InvoiceDetailView(ProfileRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        user = request.user
+        if user.profile.role == 'LANDLORD':
+            invoice = RentInvoice.objects.filter(
+                pk=pk,
+                tenancy__room__property__landlord=user
+            ).select_related('tenancy__room__property', 'tenancy__tenant').first()
+        else:
+            invoice = RentInvoice.objects.filter(
+                pk=pk,
+                tenancy__tenant=user
+            ).select_related('tenancy__room__property', 'tenancy__tenant').first()
+        if not invoice:
+            messages.error(request, "Invoice not found.")
+            return redirect('payments:invoice_list')
+        return render(request, 'payments/invoice_detail.html', {'invoice': invoice})
