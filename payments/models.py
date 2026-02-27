@@ -12,7 +12,7 @@ class RentInvoice(models.Model):
     year = models.IntegerField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     due_date = models.DateField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING', db_index=True)
     generated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
