@@ -22,6 +22,9 @@ class Room(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def is_occupied(self):
+        return self.tenancies.filter(is_active=True).exists()
+
     def __str__(self):
         return f"{self.property.name} - Room {self.room_number}"
 
