@@ -7,7 +7,7 @@ class Profile(models.Model):
         ('TENANT', 'Tenant'),
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='TENANT')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='TENANT', db_index=True)
     phone = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
