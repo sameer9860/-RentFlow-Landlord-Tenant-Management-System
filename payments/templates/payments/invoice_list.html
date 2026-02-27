@@ -55,11 +55,22 @@
                     </td>
                     <td>
                         <div class="btn-group btn-group-sm">
-                            <a href="#" class="btn btn-outline-info" title="View PDF"><i
-                                    class="fa-solid fa-file-pdf"></i></a>
+                            <a href="{% url 'payments:invoice_detail' invoice.pk %}" class="btn btn-outline-info"
+                                title="View">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            {% if user.profile.role == 'LANDLORD' and invoice.status != 'PAID' %}
+                            <form action="{% url 'payments:mark_paid' invoice.pk %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-success btn-sm" title="Mark as Paid">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </form>
+                            {% endif %}
                             {% if user.profile.role == 'TENANT' and invoice.status != 'PAID' %}
-                            <a href="#" class="btn btn-success" title="Pay Now"><i
-                                    class="fa-solid fa-credit-card me-1"></i>Pay</a>
+                            <a href="#" class="btn btn-success btn-sm" title="Pay Now">
+                                <i class="fa-solid fa-credit-card me-1"></i>Pay
+                            </a>
                             {% endif %}
                         </div>
                     </td>
