@@ -20,10 +20,11 @@ class InvoiceListView(ProfileRequiredMixin, ListView):
 
     def get_queryset(self):
         user = self.request.user
+        qs = RentInvoice.objects.select_related('tenancy__room__property', 'tenancy__tenant')
         if user.profile.role == 'LANDLORD':
-            return RentInvoice.objects.filter(tenancy__room__property__landlord=user).order_by('-year', '-month')
+            return qs.filter(tenancy__room__property__landlord=user).order_by('-year', '-month')
         else:
-            return RentInvoice.objects.filter(tenancy__tenant=user).order_by('-year', '-month')
+            return qs.filter(tenancy__tenant=user).order_by('-year', '-month')
 
 class GenerateInvoicesView(LandlordRequiredMixin, View):
     def post(self, request, *args, **kwargs):
