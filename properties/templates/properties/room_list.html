@@ -43,9 +43,10 @@
                 </td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <a href="#" class="btn btn-outline-primary" title="Edit"><i
-                                class="fa-solid fa-pen-to-square"></i></a>
-                        <a href="#" class="btn btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                        <a href="{% url 'properties:room_edit' room.pk %}" class="btn btn-outline-primary"
+                            title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="{% url 'properties:room_delete' room.pk %}" class="btn btn-outline-danger"
+                            title="Delete"><i class="fa-solid fa-trash"></i></a>
                     </div>
                 </td>
             </tr>
