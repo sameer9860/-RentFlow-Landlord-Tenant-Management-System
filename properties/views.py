@@ -32,7 +32,7 @@ class RoomListView(LandlordRequiredMixin, ListView):
     context_object_name = 'rooms'
 
     def get_queryset(self):
-        return Room.objects.filter(property__landlord=self.request.user)
+        return Room.objects.filter(property__landlord=self.request.user).select_related('property')
 
 class RoomCreateView(LandlordRequiredMixin, CreateView):
     model = Room
