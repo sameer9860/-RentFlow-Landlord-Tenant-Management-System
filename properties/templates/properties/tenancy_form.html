@@ -17,16 +17,72 @@
                 <form method="post" novalidate>
                     {% csrf_token %}
 
-                    <div class="mb-3">
-                        <label for="{{ form.tenant.id_for_label }}" class="form-label fw-bold">Select Tenant</label>
-                        {{ form.tenant }}
-                        {% if form.tenant.errors %}
-                        <div class="text-danger small">{{ form.tenant.errors }}</div>
-                        {% endif %}
+                    {% if not form.instance.pk %}
+                    <h6 class="mb-3 text-primary fw-bold">1. Tenant Account Details</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.tenant_username.id_for_label }}"
+                                class="form-label fw-bold small text-muted">Username *</label>
+                            {{ form.tenant_username }}
+                            {% if form.tenant_username.errors %}
+                            <div class="text-danger small">{{ form.tenant_username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.tenant_email.id_for_label }}"
+                                class="form-label fw-bold small text-muted">Email *</label>
+                            {{ form.tenant_email }}
+                            {% if form.tenant_email.errors %}
+                            <div class="text-danger small">{{ form.tenant_email.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.tenant_phone.id_for_label }}"
+                                class="form-label fw-bold small text-muted">Phone Number *</label>
+                            {{ form.tenant_phone }}
+                            {% if form.tenant_phone.errors %}
+                            <div class="text-danger small">{{ form.tenant_phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.tenant_address.id_for_label }}"
+                                class="form-label fw-bold small text-muted">Address *</label>
+                            {{ form.tenant_address }}
+                            {% if form.tenant_address.errors %}
+                            <div class="text-danger small">{{ form.tenant_address.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.tenant_password.id_for_label }}"
+                                class="form-label fw-bold small text-muted">Initial Password *</label>
+                            {{ form.tenant_password }}
+                            {% if form.tenant_password.errors %}
+                            <div class="text-danger small">{{ form.tenant_password.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.confirm_password.id_for_label }}"
+                                class="form-label fw-bold small text-muted">Confirm Password *</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                            <div class="text-danger small">{{ form.confirm_password.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="mb-3 text-primary fw-bold">2. Rental Details</h6>
+                    {% endif %}
+
                     <div class="mb-3">
-                        <label for="{{ form.room.id_for_label }}" class="form-label fw-bold">Select Room</label>
+                        <label for="{{ form.room.id_for_label }}" class="form-label fw-bold small text-muted">Select
+                            Room *</label>
                         {{ form.room }}
                         {% if form.room.errors %}
                         <div class="text-danger small">{{ form.room.errors }}</div>
