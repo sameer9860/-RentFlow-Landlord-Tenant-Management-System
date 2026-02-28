@@ -1,5 +1,6 @@
 from django import forms
-from .models import Property, Room
+from django.contrib.auth.models import User
+from .models import Property, Room, Tenancy
 
 class PropertyForm(forms.ModelForm):
     class Meta:
@@ -27,3 +28,22 @@ class RoomForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Filter properties to only those owned by the logged-in landlord
         self.fields['property'].queryset = Property.objects.filter(landlord=landlord)
+
+class TenancyForm(forms.ModelForm):
+    class Meta:
+        model = Tenancy
+        fields = ['tenant', 'room', 'start_date', 'end_date', 'is_active']
+        widgets = {
+            'tenant': forms.Select(attrs={'class': 'form-select'}),
+            'room': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, landlord, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filter rooms to only those owned by the logged-in landlord
+        self.fields['room'].queryset = Room.objects.filter(property__landlord=landlord).select_related('property')
+        # Filter tenants to only those with the TENANT role
+        self.fields['tenant'].queryset = User.objects.filter(profile__role='TENANT')
