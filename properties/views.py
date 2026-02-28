@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.db import transaction
+from django.contrib.auth.models import User
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -124,8 +126,37 @@ class TenancyCreateView(LandlordRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        messages.success(self.request, "Tenancy created successfully!")
-        return super().form_valid(form)
+        username = form.cleaned_data.get('tenant_username')
+        email = form.cleaned_data.get('tenant_email')
+        password = form.cleaned_data.get('tenant_password')
+        phone = form.cleaned_data.get('tenant_phone')
+        address = form.cleaned_data.get('tenant_address')
+
+        try:
+            with transaction.atomic():
+                # Create user
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password
+                )
+                
+                # Update profile (created by signal)
+                user.profile.role = 'TENANT'
+                user.profile.needs_password_change = True
+                user.profile.phone = phone
+                user.profile.address = address
+                user.profile.save()
+
+                # Link user to tenancy
+                form.instance.tenant = user
+                response = super().form_valid(form)
+                
+                messages.success(self.request, f"Tenant account '{username}' created and tenancy assigned!")
+                return response
+        except Exception as e:
+            messages.error(self.request, f"Error creating tenant: {str(e)}")
+            return self.form_invalid(form)
 
 class TenancyUpdateView(LandlordRequiredMixin, UpdateView):
     model = Tenancy
