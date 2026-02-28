@@ -1,0 +1,75 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Tenants - RentFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fa-solid fa-users me-2"></i>Tenants</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'properties:tenancy_add' %}" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-plus me-1"></i>Add New Tenancy
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tenant</th>
+                        <th>Property & Room</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tenancy in tenancies %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold">{{ tenancy.tenant.username }}</div>
+                            <small class="text-muted">{{ tenancy.tenant.email }}</small>
+                        </td>
+                        <td>
+                            <div>{{ tenancy.room.property.name }}</div>
+                            <small class="text-muted">Room {{ tenancy.room.room_number }}</small>
+                        </td>
+                        <td>{{ tenancy.start_date }}</td>
+                        <td>{{ tenancy.end_date|default:"Ongoing" }}</td>
+                        <td>
+                            {% if tenancy.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'properties:tenancy_edit' tenancy.pk %}"
+                                class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <a href="{% url 'properties:tenancy_delete' tenancy.pk %}"
+                                class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <div class="text-muted mb-2">No tenancies found.</div>
+                            <a href="{% url 'properties:tenancy_add' %}" class="btn btn-sm btn-outline-primary">
+                                Add your first tenant
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
