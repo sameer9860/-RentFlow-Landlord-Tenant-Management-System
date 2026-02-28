@@ -7,7 +7,8 @@ from django.utils import timezone
 from datetime import date
 from core.mixins import LandlordRequiredMixin
 from properties.models import Tenancy
-from .models import RentInvoice
+from .models import RentInvoice, Payment
+from .forms import PaymentForm
 
 class ProfileRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -87,4 +88,37 @@ class InvoiceDetailView(ProfileRequiredMixin, View):
         if not invoice:
             messages.error(request, "Invoice not found.")
             return redirect('payments:invoice_list')
-        return render(request, 'payments/invoice_detail.html', {'invoice': invoice})
+        
+        context = {'invoice': invoice}
+        if user.profile.role == 'TENANT' and invoice.status == 'PENDING':
+            context['payment_form'] = PaymentForm()
+            
+        return render(request, 'payments/invoice_detail.html', context)
+
+class ProcessPaymentView(ProfileRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        invoice = RentInvoice.objects.filter(
+            pk=pk,
+            tenancy__tenant=request.user,
+            status='PENDING'
+        ).first()
+
+        if not invoice:
+            messages.error(request, "Invoice not found or already paid.")
+            return redirect('payments:invoice_list')
+
+        form = PaymentForm(request.POST)
+        if form.is_valid():
+            payment = form.save(commit=False)
+            payment.invoice = invoice
+            payment.paid_amount = invoice.amount
+            payment.save()
+
+            invoice.status = 'PAID'
+            invoice.save()
+
+            messages.success(request, f"Payment for Invoice #{invoice.id} processed successfully.")
+            return redirect('payments:invoice_detail', pk=pk)
+        
+        messages.error(request, "Invalid payment details.")
+        return redirect('payments:invoice_detail', pk=pk)
