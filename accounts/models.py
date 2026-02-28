@@ -10,6 +10,7 @@ class Profile(models.Model):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='TENANT', db_index=True)
     phone = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
+    needs_password_change = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
