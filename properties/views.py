@@ -4,8 +4,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from core.mixins import LandlordRequiredMixin
-from .models import Property, Room
-from .forms import PropertyForm, RoomForm
+from .models import Property, Room, Tenancy
+from .forms import PropertyForm, RoomForm, TenancyForm
 
 class PropertyListView(LandlordRequiredMixin, ListView):
     model = Property
@@ -102,4 +102,57 @@ class RoomDeleteView(LandlordRequiredMixin, DeleteView):
 
     def form_valid(self, form):
         messages.success(self.request, "Room deleted successfully!")
+        return super().form_valid(form)
+
+class TenancyListView(LandlordRequiredMixin, ListView):
+    model = Tenancy
+    template_name = 'properties/tenancy_list.html'
+    context_object_name = 'tenancies'
+
+    def get_queryset(self):
+        return Tenancy.objects.filter(room__property__landlord=self.request.user).select_related('tenant', 'room__property')
+
+class TenancyCreateView(LandlordRequiredMixin, CreateView):
+    model = Tenancy
+    form_class = TenancyForm
+    template_name = 'properties/tenancy_form.html'
+    success_url = reverse_lazy('properties:tenancy_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['landlord'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tenancy created successfully!")
+        return super().form_valid(form)
+
+class TenancyUpdateView(LandlordRequiredMixin, UpdateView):
+    model = Tenancy
+    form_class = TenancyForm
+    template_name = 'properties/tenancy_form.html'
+    success_url = reverse_lazy('properties:tenancy_list')
+
+    def get_queryset(self):
+        return Tenancy.objects.filter(room__property__landlord=self.request.user)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['landlord'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tenancy updated successfully!")
+        return super().form_valid(form)
+
+class TenancyDeleteView(LandlordRequiredMixin, DeleteView):
+    model = Tenancy
+    template_name = 'properties/tenancy_confirm_delete.html'
+    success_url = reverse_lazy('properties:tenancy_list')
+
+    def get_queryset(self):
+        return Tenancy.objects.filter(room__property__landlord=self.request.user)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tenancy deleted successfully!")
         return super().form_valid(form)
