@@ -52,6 +52,9 @@
                     <li class="nav-item">
                         <a class="nav-item nav-link" href="{% url 'properties:room_list' %}">Rooms</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link" href="{% url 'properties:tenancy_list' %}">Tenants</a>
+                    </li>
                     {% elif user.profile.role == 'TENANT' %}
                     <li class="nav-item">
                         <a class="nav-item nav-link" href="{% url 'dashboard:tenant_dash' %}">My Dashboard</a>
