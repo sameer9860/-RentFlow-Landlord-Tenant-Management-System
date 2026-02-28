@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Delete Tenancy - RentFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center pt-5">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white fw-bold">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>Confirm Deletion
+            </div>
+            <div class="card-body py-4">
+                <p class="mb-4">Are you sure you want to delete the tenancy of <strong>{{ object.tenant.username
+                        }}</strong> at <strong>{{ object.room }}</strong>?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'properties:tenancy_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4">Delete Permanently</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
