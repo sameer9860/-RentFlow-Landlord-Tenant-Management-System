@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import RentInvoice, Payment
+from .models import RentInvoice, Payment, Expense
 
 class PaymentInline(admin.TabularInline):
     model = Payment
@@ -17,4 +17,10 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ('id', 'invoice', 'paid_amount', 'payment_date', 'method', 'transaction_id')
     list_filter = ('method', 'payment_date')
     search_fields = ('invoice__id', 'transaction_id')
+
+@admin.register(Expense)
+class ExpenseAdmin(admin.ModelAdmin):
+    list_display = ('id', 'category', 'amount', 'date', 'description')
+    list_filter = ('category', 'date')
+    search_fields = ('description',)
 
