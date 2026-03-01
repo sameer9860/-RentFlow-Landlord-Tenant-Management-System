@@ -61,8 +61,16 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-item nav-link" href="{% url 'payments:invoice_list' %}">Invoices</a>
+                        <a class="nav-link" href="{% url 'payments:invoice_list' %}">Invoices</a>
                     </li>
+                    {% if user.profile.role == 'LANDLORD' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'payments:expense_list' %}">Expenses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'payments:financial_report' %}">Reports</a>
+                    </li>
+                    {% endif %}
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
