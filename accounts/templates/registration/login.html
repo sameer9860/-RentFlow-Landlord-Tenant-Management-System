@@ -2,62 +2,194 @@
 
 {% block title %}Login - RentFlow{% endblock %}
 
-{% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 text-center border-bottom-0">
-                <h4 class="mb-0 font-weight-bold text-primary"><i class="fas fa-sign-in-alt me-2"></i>Welcome Back</h4>
-                <p class="text-muted small mt-2">Please login to your RentFlow account</p>
-            </div>
-            <div class="card-body p-4">
-                <form method="post">
+{% block guest_content %}
+
+<style>
+    /* Background */
+    body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #4e73df, #1cc88a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Glass Card */
+    .glass-card {
+        backdrop-filter: blur(18px);
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        color: #fff;
+    }
+
+    /* Floating input customization */
+    .form-floating > .form-control {
+        background: rgba(255, 255, 255, 0.85);
+        border: none;
+    }
+
+    .form-floating > label {
+        color: #6c757d;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.4);
+    }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        }
+
+        .glass-card {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .form-floating > .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .form-floating > label {
+            color: #ddd;
+        }
+    }
+
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        z-index: 10;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+
+            <div class="glass-card p-5">
+
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold">
+                        <i class="fas fa-sign-in-alt me-2"></i>Welcome Back
+                    </h3>
+                    <p class="small text-light opacity-75">
+                        Login to your RentFlow account
+                    </p>
+                </div>
+
+                <!-- Form -->
+                <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
 
                     {% if form.errors %}
-                    <div class="alert alert-danger small py-2 mb-3">
-                        Your username and password didn't match. Please try again.
+                    <div class="alert alert-danger small">
+                        Invalid username or password.
                     </div>
                     {% endif %}
 
-                    <div class="mb-3">
-                        <label for="id_username" class="form-label small fw-bold">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i
-                                    class="fas fa-user text-muted"></i></span>
-                            <input type="text" name="username" autofocus maxlength="150" required id="id_username"
-                                class="form-control border-start-0 bg-light" placeholder="Enter username">
+                    <!-- Username Floating -->
+                    <div class="form-floating mb-3">
+                        <input type="text"
+                               class="form-control"
+                               id="id_username"
+                               name="username"
+                               placeholder="Username"
+                               required>
+                        <label for="id_username">
+                            <i class="fas fa-user me-2"></i>Username
+                        </label>
+                        <div class="invalid-feedback">
+                            Please enter your username.
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="id_password" class="form-label small fw-bold">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i
-                                    class="fas fa-lock text-muted"></i></span>
-                            <input type="password" name="password" required id="id_password"
-                                class="form-control border-start-0 bg-light" placeholder="Enter password">
+                    <!-- Password Floating -->
+                    <div class="form-floating mb-4 position-relative">
+                        <input type="password"
+                               class="form-control"
+                               id="id_password"
+                               name="password"
+                               placeholder="Password"
+                               required>
+                        <label for="id_password">
+                            <i class="fas fa-lock me-2"></i>Password
+                        </label>
+
+                        <!-- Toggle Icon -->
+                        <span class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </span>
+
+                        <div class="invalid-feedback">
+                            Please enter your password.
                         </div>
                     </div>
 
+                    <!-- Submit -->
                     <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary py-2 fw-bold">Sign In</button>
+                        <button type="submit" class="btn btn-light fw-bold py-2 rounded-3">
+                            Sign In
+                        </button>
                     </div>
 
                     <div class="text-center">
-                        <a href="{% url 'password_reset' %}" class="small text-decoration-none">Forgot
-                            password?</a>
+                        <a href="{% url 'password_reset' %}"
+                           class="small text-decoration-none text-light">
+                            Forgot password?
+                        </a>
                     </div>
                 </form>
-            </div>
-            <div class="card-footer bg-light py-3 border-top-0 text-center small">
-                Don't have an account? <a href="#" class="text-decoration-none fw-bold">Contact Admin</a>
-            </div>
-        </div>
 
-        <div class="text-center mt-4 text-muted small">
-            &copy; 2026 RentFlow Landlord-Tenant Management
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-4 text-white small opacity-75">
+                &copy; 2026 RentFlow Landlord-Tenant Management
+            </div>
+
         </div>
     </div>
 </div>
+
+<!-- Password Toggle Script -->
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('id_password');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+
+        toggleIcon.classList.toggle('fa-eye');
+        toggleIcon.classList.toggle('fa-eye-slash');
+    });
+</script>
+
+<!-- Bootstrap 5 Validation Script -->
+<script>
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+
 {% endblock %}
