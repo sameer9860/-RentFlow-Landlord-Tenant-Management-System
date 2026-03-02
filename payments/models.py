@@ -3,6 +3,7 @@ from django.db import models
 class RentInvoice(models.Model):
     STATUS_CHOICES = (
         ('PENDING', 'Pending'),
+        ('AWAITING', 'Awaiting Confirmation'),  # payment submitted by tenant but waiting for landlord
         ('PAID', 'Paid'),
         ('LATE', 'Late'),
     )
