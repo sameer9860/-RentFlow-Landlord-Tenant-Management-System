@@ -30,6 +30,35 @@ class LandlordDashboardView(LandlordRequiredMixin, TemplateView):
         ).aggregate(Sum('paid_amount'))['paid_amount__sum'] or 0
         context['collected_income'] = collected
         context['pending_income'] = context['expected_income'] - collected
+
+        # monthly breakdown (for charts on dashboard)
+        from django.utils import timezone
+        from payments.models import Expense
+        today = timezone.now().date()
+        month = today.month
+        year = today.year
+        invoices_month = all_invoices.filter(month=month, year=year)
+        payments_month = Payment.objects.filter(
+            invoice__tenancy__room__property__landlord=user,
+            invoice__status='PAID',
+            payment_date__month=month,
+            payment_date__year=year
+        )
+        expenses_month = Expense.objects.filter(
+            landlord=user,
+            date__month=month,
+            date__year=year
+        )
+        revenue = payments_month.aggregate(total=Sum('paid_amount'))['total'] or 0
+        expenses = expenses_month.aggregate(total=Sum('amount'))['total'] or 0
+        profit = revenue - expenses
+        due_summary = invoices_month.filter(status__in=['PENDING','AWAITING']).aggregate(total=Sum('amount'))['total'] or 0
+        context.update({
+            'dash_revenue': revenue,
+            'dash_expenses': expenses,
+            'dash_profit': profit,
+            'dash_due': due_summary,
+        })
         
         total_rooms = context['total_rooms']
         active = context['active_tenancies']
