@@ -71,16 +71,18 @@ class GenerateInvoicesView(LandlordRequiredMixin, View):
 
 class MarkInvoicePaidView(LandlordRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
+        # Only allow confirming invoices that are awaiting confirmation
         invoice = RentInvoice.objects.filter(
             pk=pk,
-            tenancy__room__property__landlord=request.user
+            tenancy__room__property__landlord=request.user,
+            status='AWAITING'
         ).first()
         if invoice:
             invoice.status = 'PAID'
             invoice.save()
-            messages.success(request, f"Invoice #{invoice.id} marked as paid.")
+            messages.success(request, f"Invoice #{invoice.id} payment confirmed.")
         else:
-            messages.error(request, "Invoice not found or access denied.")
+            messages.error(request, "Invoice not found, not awaiting confirmation, or access denied.")
         return redirect('payments:invoice_list')
 
 class InvoiceDetailView(ProfileRequiredMixin, View):
@@ -125,10 +127,11 @@ class ProcessPaymentView(ProfileRequiredMixin, View):
             payment.paid_amount = invoice.amount
             payment.save()
 
-            invoice.status = 'PAID'
+            # Instead of marking the invoice paid immediately we flag it as awaiting landlord confirmation
+            invoice.status = 'AWAITING'
             invoice.save()
 
-            messages.success(request, f"Payment for Invoice #{invoice.id} processed successfully.")
+            messages.success(request, f"Payment for Invoice #{invoice.id} submitted and awaiting landlord confirmation.")
             return redirect('payments:invoice_detail', pk=pk)
         
         messages.error(request, "Invalid payment details.")
