@@ -1,5 +1,6 @@
 from django import forms
-from .models import Payment
+from .models import Payment, Expense
+
 
 class PaymentForm(forms.ModelForm):
     class Meta:
@@ -10,7 +11,6 @@ class PaymentForm(forms.ModelForm):
             'transaction_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional transaction reference'}),
         }
 
-from .models import Expense
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
