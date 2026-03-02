@@ -47,6 +47,8 @@
                     <td>
                         {% if invoice.status == 'PAID' %}
                         <span class="badge bg-success">Paid</span>
+                        {% elif invoice.status == 'AWAITING' %}
+                        <span class="badge bg-info text-dark">Awaiting Confirmation</span>
                         {% elif invoice.status == 'LATE' %}
                         <span class="badge bg-danger">Late</span>
                         {% else %}
@@ -59,18 +61,24 @@
                                 title="View">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
-                            {% if user.profile.role == 'LANDLORD' and invoice.status != 'PAID' %}
-                            <form action="{% url 'payments:mark_paid' invoice.pk %}" method="post" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-success btn-sm" title="Mark as Paid">
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                            </form>
+                            {% if user.profile.role == 'LANDLORD' %}
+                                {% if invoice.status == 'AWAITING' %}
+                                <form action="{% url 'payments:mark_paid' invoice.pk %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-success btn-sm" title="Confirm Payment">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
                             {% endif %}
-                            {% if user.profile.role == 'TENANT' and invoice.status != 'PAID' %}
-                            <a href="#" class="btn btn-success btn-sm" title="Pay Now">
-                                <i class="fa-solid fa-credit-card me-1"></i>Pay
-                            </a>
+                            {% if user.profile.role == 'TENANT' %}
+                                {% if invoice.status == 'PENDING' %}
+                                <a href="{% url 'payments:invoice_detail' invoice.pk %}" class="btn btn-success btn-sm" title="Pay Now">
+                                    <i class="fa-solid fa-credit-card me-1"></i>Pay
+                                </a>
+                                {% elif invoice.status == 'AWAITING' %}
+                                <span class="text-secondary small">Awaiting confirmation</span>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </td>
