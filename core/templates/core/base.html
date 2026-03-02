@@ -243,33 +243,85 @@
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{% url 'properties:property_list' %}"
-                class="nav-link-custom {% if 'property' in request.resolver_match.view_name %}active{% endif %}">
-                <i class="fa-solid fa-city"></i>
-                <span>Properties</span>
-            </a>
-            <a href="{% url 'properties:room_list' %}"
-                class="nav-link-custom {% if 'room' in request.resolver_match.view_name %}active{% endif %}">
-                <i class="fa-solid fa-door-open"></i>
-                <span>Rooms</span>
-            </a>
-            <a href="{% url 'properties:tenancy_list' %}"
-                class="nav-link-custom {% if 'tenancy' in request.resolver_match.view_name %}active{% endif %}">
-                <i class="fa-solid fa-users"></i>
-                <span>Tenants</span>
-            </a>
+            
+            <!-- Properties group -->
+            <div class="nav-item">
+                <a class="nav-link-custom" data-bs-toggle="collapse" href="#collapse-properties" role="button"
+                    aria-expanded="false" aria-controls="collapse-properties">
+                    <i class="fa-solid fa-city"></i>
+                    <span>Properties</span>
+                </a>
+                <div class="collapse" id="collapse-properties">
+                    <a href="{% url 'properties:property_add' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-circle-plus fa-xs me-1"></i>Add Property</a>
+                    <a href="{% url 'properties:property_list' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-list fa-xs me-1"></i>Property List</a>
+                </div>
+            </div>
+
+            <!-- Rooms group -->
+            <div class="nav-item">
+                <a class="nav-link-custom" data-bs-toggle="collapse" href="#collapse-rooms" role="button"
+                    aria-expanded="false" aria-controls="collapse-rooms">
+                    <i class="fa-solid fa-door-open"></i>
+                    <span>Rooms</span>
+                </a>
+                <div class="collapse" id="collapse-rooms">
+                    <a href="{% url 'properties:room_add' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-circle-plus fa-xs me-1"></i>Add Room</a>
+                    <a href="{% url 'properties:room_list' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-list fa-xs me-1"></i>Room List</a>
+                </div>
+            </div>
+
+            <!-- Tenants group -->
+            <div class="nav-item">
+                <a class="nav-link-custom" data-bs-toggle="collapse" href="#collapse-tenants" role="button"
+                    aria-expanded="false" aria-controls="collapse-tenants">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Tenants</span>
+                </a>
+                <div class="collapse" id="collapse-tenants">
+                    <a href="{% url 'properties:tenancy_add' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-circle-plus fa-xs me-1"></i>Add Tenant</a>
+                    <a href="{% url 'properties:tenancy_list' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-list fa-xs me-1"></i>Tenant List</a>
+                </div>
+            </div>
 
             <div class="nav-header mt-3">Finance</div>
-            <a href="{% url 'payments:invoice_list' %}"
-                class="nav-link-custom {% if 'invoice' in request.resolver_match.view_name %}active{% endif %}">
-                <i class="fa-solid fa-file-invoice-dollar"></i>
-                <span>Invoices</span>
-            </a>
-            <a href="{% url 'payments:expense_list' %}"
-                class="nav-link-custom {% if 'expense' in request.resolver_match.view_name %}active{% endif %}">
-                <i class="fa-solid fa-wallet"></i>
-                <span>Expenses</span>
-            </a>
+
+            <!-- Invoices group -->
+            <div class="nav-item">
+                <a class="nav-link-custom" data-bs-toggle="collapse" href="#collapse-invoices" role="button"
+                    aria-expanded="false" aria-controls="collapse-invoices">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Invoices</span>
+                </a>
+                <div class="collapse" id="collapse-invoices">
+
+                    <a href="{% url 'payments:generate_invoices' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-circle-plus fa-xs me-1"></i>Generate</a>
+                    <a href="{% url 'payments:invoice_list' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-list fa-xs me-1"></i>Invoice List</a>
+                </div>
+            </div>
+
+            <!-- Expenses group -->
+            <div class="nav-item">
+                <a class="nav-link-custom" data-bs-toggle="collapse" href="#collapse-expenses" role="button"
+                    aria-expanded="false" aria-controls="collapse-expenses">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Expenses</span>
+                </a>
+                <div class="collapse" id="collapse-expenses">
+                    <a href="{% url 'payments:expense_create' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-circle-plus fa-xs me-1"></i>Add Expense</a>
+                    <a href="{% url 'payments:expense_list' %}" class="nav-link-custom ms-4">
+                        <i class="fa-solid fa-list fa-xs me-1"></i>Expense List</a>
+                </div>
+            </div>
+
             <a href="{% url 'payments:financial_report' %}"
                 class="nav-link-custom {% if 'report' in request.resolver_match.view_name %}active{% endif %}">
                 <i class="fa-solid fa-chart-pie"></i>
