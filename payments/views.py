@@ -39,7 +39,7 @@ class InvoiceListView(ProfileRequiredMixin, ListView):
             return qs.filter(tenancy__tenant=user).order_by('-year', '-month')
 
 class GenerateInvoicesView(LandlordRequiredMixin, View):
-    def post(self, request, *args, **kwargs):
+    def _generate(self, request):
         today = timezone.now().date()
         month = today.month
         year = today.year
@@ -68,6 +68,13 @@ class GenerateInvoicesView(LandlordRequiredMixin, View):
             messages.info(request, f"No new invoices to generate for {month}/{year}.")
             
         return redirect('payments:invoice_list')
+
+    def post(self, request, *args, **kwargs):
+        return self._generate(request)
+
+    def get(self, request, *args, **kwargs):
+        # allow sidebar GET link to work; perform same action as post
+        return self._generate(request)
 
 class MarkInvoicePaidView(LandlordRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):

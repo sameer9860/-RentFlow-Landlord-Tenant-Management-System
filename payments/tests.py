@@ -54,3 +54,24 @@ class PaymentConfirmationWorkflowTests(TestCase):
         resp = self.client.post(url)
         self.invoice.refresh_from_db()
         self.assertEqual(self.invoice.status, 'PAID')
+
+    def test_generate_invoices_get_works(self):
+        # ensure GET on generation endpoint triggers creation
+        self.client.login(username='landlord', password='pass')
+        self.invoice.delete()  # remove existing invoice
+        url = reverse('payments:generate_invoices')
+        resp = self.client.get(url)
+        self.assertRedirects(resp, reverse('payments:invoice_list'))
+        self.assertTrue(RentInvoice.objects.filter(tenancy=self.tenancy, month=1, year=2024).exists())
+
+    def test_landlord_confirms_payment(self):
+        # simulate tenant already paid
+        Payment.objects.create(invoice=self.invoice, paid_amount=self.invoice.amount, method='CASH')
+        self.invoice.status = 'AWAITING'
+        self.invoice.save()
+
+        self.client.login(username='landlord', password='pass')
+        url = reverse('payments:mark_paid', kwargs={'pk': self.invoice.pk})
+        resp = self.client.post(url)
+        self.invoice.refresh_from_db()
+        self.assertEqual(self.invoice.status, 'PAID')
