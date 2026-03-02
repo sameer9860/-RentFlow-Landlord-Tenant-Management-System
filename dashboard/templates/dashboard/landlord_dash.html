@@ -128,4 +128,58 @@
     </div>
 </div>
 
+<!-- Small charts -->
+<div class="row mt-3">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-3">
+                <h6 class="fw-bold small text-muted">This Month: Revenue/Expenses/Due (Pie)</h6>
+                <canvas id="dashPie" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-3">
+                <h6 class="fw-bold small text-muted">This Month: Totals (Bar)</h6>
+                <canvas id="dashBar" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js for dashboard -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rev = parseFloat('{{ dash_revenue }}') || 0;
+    const exp = parseFloat('{{ dash_expenses }}') || 0;
+    const prof = parseFloat('{{ dash_profit }}') || 0;
+    const due = parseFloat('{{ dash_due }}') || 0;
+
+    const pieCtx = document.getElementById('dashPie');
+    if (pieCtx) {
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Revenue','Expenses','Due'],
+                datasets: [{ data: [rev, exp, due], backgroundColor: ['#1cc88a','#e74a3b','#f6c23e'] }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+    const barCtx = document.getElementById('dashBar');
+    if (barCtx) {
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Revenue','Expenses','Profit'],
+                datasets: [{ label: 'Amount', data: [rev, exp, prof], backgroundColor: ['#1cc88a','#e74a3b','#4e73df'] }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    }
+});
+</script>
+
 {% endblock %}
