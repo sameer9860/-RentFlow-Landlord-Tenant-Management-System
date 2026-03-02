@@ -23,7 +23,11 @@ class LandlordDashboardView(LandlordRequiredMixin, TemplateView):
         all_invoices = RentInvoice.objects.filter(tenancy__room__property__landlord=user)
         context['expected_income'] = all_invoices.aggregate(Sum('amount'))['amount__sum'] or 0
         
-        collected = Payment.objects.filter(invoice__tenancy__room__property__landlord=user).aggregate(Sum('paid_amount'))['paid_amount__sum'] or 0
+        # only count payments for invoices that have been confirmed
+        collected = Payment.objects.filter(
+            invoice__tenancy__room__property__landlord=user,
+            invoice__status='PAID'
+        ).aggregate(Sum('paid_amount'))['paid_amount__sum'] or 0
         context['collected_income'] = collected
         context['pending_income'] = context['expected_income'] - collected
         
