@@ -8,8 +8,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         today = timezone.now().date()
         
+        # treat awaiting confirmation same as pending for lateness
         overdue_invoices = RentInvoice.objects.filter(
-            status='PENDING',
+            status__in=['PENDING', 'AWAITING'],
             due_date__lt=today
         )
         

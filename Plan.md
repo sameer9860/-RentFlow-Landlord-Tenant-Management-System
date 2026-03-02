@@ -187,6 +187,7 @@ payments/models.py:
 
 python
 class RentInvoice(models.Model):
+# note: added 'AWAITING' status to support landlord confirmation workflow
 tenancy = models.ForeignKey('properties.Tenancy', on_delete=models.CASCADE)
 month = models.IntegerField()
 year = models.IntegerField()
