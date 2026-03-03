@@ -5,6 +5,7 @@ from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import TenantPasswordChangeForm
+from .models import Profile
 
 class DashboardRedirectView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -35,3 +36,7 @@ class TenantPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
         profile.save()
         messages.success(self.request, "Password changed successfully! Welcome to RentFlow.")
         return response
+
+def profile_view(request, profile_id):
+    profile = Profile.objects.get(id=profile_id)
+    return render(request, 'accounts/profile.html', {'profile': profile})
