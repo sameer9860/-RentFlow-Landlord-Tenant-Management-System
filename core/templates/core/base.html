@@ -377,7 +377,7 @@
                         <i class="fa-solid fa-user-circle fa-lg text-primary"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile_view' profile_id=user.profile.id %}"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
