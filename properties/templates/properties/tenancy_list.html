@@ -18,6 +18,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th>S.N.</th>
                         <th>Tenant</th>
                         <th>Property & Room</th>
                         <th>Start Date</th>
@@ -29,6 +30,7 @@
                 <tbody>
                     {% for tenancy in tenancies %}
                     <tr>
+                        <td>{{ forloop.counter }}</td>
                         <td>
                             <div class="fw-bold">{{ tenancy.tenant.username }}</div>
                             <small class="text-muted">{{ tenancy.tenant.email }}</small>
@@ -59,7 +61,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center py-4">
+                        <td colspan="7" class="text-center py-4">
                             <div class="text-muted mb-2">No tenancies found.</div>
                             <a href="{% url 'properties:tenancy_add' %}" class="btn btn-sm btn-outline-primary">
                                 Add your first tenant
