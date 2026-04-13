@@ -9,13 +9,47 @@ from core.mixins import LandlordRequiredMixin
 from .models import Property, Room, Tenancy
 from .forms import PropertyForm, RoomForm, TenancyForm
 
+from django.db.models import Count, Sum, Q, Case, When, DecimalField
+
 class PropertyListView(LandlordRequiredMixin, ListView):
     model = Property
     template_name = 'properties/property_list.html'
     context_object_name = 'properties'
 
     def get_queryset(self):
-        return Property.objects.filter(landlord=self.request.user)
+        return Property.objects.filter(landlord=self.request.user).annotate(
+            num_rooms=Count('rooms', distinct=True),
+            num_occupied=Count('rooms', filter=Q(rooms__tenancies__is_active=True), distinct=True),
+            total_potential_income=Sum('rooms__monthly_rent'),
+            total_actual_income=Sum(
+                Case(
+                    When(rooms__tenancies__is_active=True, then='rooms__monthly_rent'),
+                    default=0,
+                    output_field=DecimalField()
+                )
+            )
+        ).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        properties = self.get_queryset()
+        
+        # Summary statistics
+        total_properties = properties.count()
+        total_rooms = sum(p.num_rooms for p in properties)
+        total_occupied = sum(p.num_occupied for p in properties)
+        total_monthly_revenue = sum(p.total_actual_income or 0 for p in properties)
+        
+        occupancy_rate = (total_occupied / total_rooms * 100) if total_rooms > 0 else 0
+        
+        context.update({
+            'total_properties': total_properties,
+            'total_rooms': total_rooms,
+            'total_occupied': total_occupied,
+            'total_monthly_revenue': total_monthly_revenue,
+            'occupancy_rate': round(occupancy_rate, 1),
+        })
+        return context
 
 class PropertyCreateView(LandlordRequiredMixin, CreateView):
     model = Property
