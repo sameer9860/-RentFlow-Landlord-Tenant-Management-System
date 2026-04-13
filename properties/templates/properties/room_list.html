@@ -2,62 +2,264 @@
 
 {% block title %}Rooms - RentFlow{% endblock %}
 
+{% block extra_css %}
+<style>
+    .metric-card {
+        border: none;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+        background: #fff;
+    }
+    .metric-card:hover {
+        transform: translateY(-3px);
+    }
+    .search-container {
+        position: relative;
+    }
+    .search-container i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+    }
+    .search-input {
+        padding-left: 45px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        height: 42px;
+    }
+    .filter-btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+    }
+    .filter-btn.active {
+        background: #3699ff;
+        color: #fff;
+        border-color: #3699ff;
+    }
+    .table-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .room-row {
+        transition: background-color 0.2s;
+    }
+    .badge-status {
+        width: 80px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">All Rooms</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="{% url 'properties:room_add' %}" class="btn btn-sm btn-outline-primary"><i
-                class="fa-solid fa-plus me-1"></i>Add Room</a>
+<div class="row align-items-center mb-4">
+    <div class="col-md-6">
+        <h3 class="fw-bold mb-1">Room Management</h3>
+        <p class="text-muted">Manage all rooms across your properties</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a href="{% url 'properties:room_add' %}" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+            <i class="fa-solid fa-plus me-2"></i>Add New Room
+        </a>
     </div>
 </div>
 
-<div class="table-responsive bg-white p-3 rounded shadow-sm">
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>S.N.</th>
-                <th>Room </th>
-                <th>Property</th>
-                <th>Monthly Rent</th>
-                <th>Capacity</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for room in rooms %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td><strong>{{ room.room_number }}</strong></td>
-                <td>{{ room.property.name }}</td>
-                <td>NPR {{ room.monthly_rent }}</td>
-                <td>{{ room.capacity }}</td>
-                <td>
-                    {% if room.is_active %}
-                    {% if room.is_occupied %}
-                    <span class="badge bg-danger">Occupied</span>
-                    {% else %}
-                    <span class="badge bg-success">Vacant</span>
-                    {% endif %}
-                    {% else %}
-                    <span class="badge bg-secondary">Inactive</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="btn-group btn-group-sm">
-                        <a href="{% url 'properties:room_edit' room.pk %}" class="btn btn-outline-primary"
-                            title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
-                        <a href="{% url 'properties:room_delete' room.pk %}" class="btn btn-outline-danger"
-                            title="Delete"><i class="fa-solid fa-trash"></i></a>
+<!-- Summary Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card metric-card shadow-sm">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light-primary p-3 rounded-3 me-3">
+                        <i class="fa-solid fa-door-open text-primary"></i>
                     </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7" class="text-center py-4 text-muted">No rooms available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    <div>
+                        <h6 class="text-muted mb-0">Total Rooms</h6>
+                        <h4 class="fw-bold mb-0">{{ total_rooms }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card metric-card shadow-sm">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light-danger p-3 rounded-3 me-3">
+                        <i class="fa-solid fa-user-lock text-danger"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Occupied</h6>
+                        <h4 class="fw-bold mb-0">{{ occupied_rooms }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card metric-card shadow-sm">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light-success p-3 rounded-3 me-3">
+                        <i class="fa-solid fa-key text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Vacant</h6>
+                        <h4 class="fw-bold mb-0">{{ vacant_rooms }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Filter Bar -->
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body p-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-5 col-md-12">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="roomSearch" class="form-control search-input"
+                        placeholder="Search room number or property...">
+                </div>
+            </div>
+            <div class="col-lg-7 col-md-12 text-md-end">
+                <div class="d-flex gap-2 justify-content-lg-end overflow-auto pb-1 pb-lg-0">
+                    <button class="filter-btn active" data-status="all">All Rooms</button>
+                    <button class="filter-btn" data-status="occupied">Occupied</button>
+                    <button class="filter-btn" data-status="vacant">Vacant</button>
+                    <button class="filter-btn" data-status="inactive">Inactive</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card table-card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="roomTable">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4 py-3 text-muted small text-uppercase fw-bold">Room</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Property</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Rent</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Capacity</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Status</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr class="room-row" data-name="{{ room.room_number|lower }}" data-property="{{ room.property.name|lower }}" 
+                    data-status="{% if not room.is_active %}inactive{% elif room.is_occupied_calc %}occupied{% else %}vacant{% endif %}">
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light p-2 rounded-2 me-3">
+                                <i class="fa-solid fa-hashtag text-muted small"></i>
+                            </div>
+                            <span class="fw-bold text-dark">{{ room.room_number }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="text-muted">{{ room.property.name }}</span>
+                    </td>
+                    <td>
+                        <span class="fw-medium text-dark">Rs. {{ room.monthly_rent }}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-users-viewfinder text-muted me-2 small"></i>
+                            <span>{{ room.capacity }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if not room.is_active %}
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-2 badge-status">Inactive</span>
+                        {% elif room.is_occupied_calc %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2 badge-status">Occupied</span>
+                        {% else %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 badge-status">Vacant</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end pe-4">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light rounded-2" type="button" data-bs-toggle="dropdown">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <li><a class="dropdown-item" href="{% url 'properties:room_edit' room.pk %}">
+                                    <i class="fa-solid fa-pen-to-square me-2 small"></i>Edit</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'properties:room_delete' room.pk %}">
+                                    <i class="fa-solid fa-trash me-2 small"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-door-closed fa-3x text-muted opacity-25"></i>
+                        </div>
+                        <p class="text-muted">No rooms available. Start by adding a room to your property.</p>
+                        <a href="{% url 'properties:room_add' %}" class="btn btn-primary btn-sm px-4">Add Room</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('roomSearch');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const roomRows = document.querySelectorAll('.room-row');
+
+        let currentSearch = '';
+        let currentStatus = 'all';
+
+        function updateFilters() {
+            roomRows.forEach(row => {
+                const name = row.getAttribute('data-name');
+                const property = row.getAttribute('data-property');
+                const status = row.getAttribute('data-status');
+
+                const matchesSearch = name.includes(currentSearch) || property.includes(currentSearch);
+                const matchesStatus = currentStatus === 'all' || status === currentStatus;
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', function () {
+            currentSearch = this.value.toLowerCase().trim();
+            updateFilters();
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentStatus = this.getAttribute('data-status');
+                updateFilters();
+            });
+        });
+    });
+</script>
 {% endblock %}
