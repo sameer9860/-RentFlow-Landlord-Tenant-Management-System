@@ -9,7 +9,7 @@ from core.mixins import LandlordRequiredMixin
 from .models import Property, Room, Tenancy
 from .forms import PropertyForm, RoomForm, TenancyForm
 
-from django.db.models import Count, Sum, Q, Case, When, DecimalField
+from django.db.models import Count, Sum, Q, Case, When, DecimalField, Exists, OuterRef
 
 class PropertyListView(LandlordRequiredMixin, ListView):
     model = Property
@@ -93,7 +93,32 @@ class RoomListView(LandlordRequiredMixin, ListView):
     context_object_name = 'rooms'
 
     def get_queryset(self):
-        return Room.objects.filter(property__landlord=self.request.user).select_related('property')
+        # We use a subquery to check for active tenancies efficiently
+        active_tenancy_exists = Tenancy.objects.filter(
+            room=OuterRef('pk'),
+            is_active=True
+        )
+        return Room.objects.filter(
+            property__landlord=self.request.user
+        ).select_related('property').annotate(
+            is_occupied_calc=Exists(active_tenancy_exists)
+        ).order_by('property__name', 'room_number')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        rooms = self.get_queryset()
+        
+        # Summary statistics
+        total_rooms = rooms.count()
+        occupied_rooms = sum(1 for r in rooms if r.is_occupied_calc)
+        vacant_rooms = sum(1 for r in rooms if not r.is_occupied_calc and r.is_active)
+        
+        context.update({
+            'total_rooms': total_rooms,
+            'occupied_rooms': occupied_rooms,
+            'vacant_rooms': vacant_rooms,
+        })
+        return context
 
 class RoomCreateView(LandlordRequiredMixin, CreateView):
     model = Room
