@@ -147,7 +147,7 @@
         <table class="table table-hover align-middle mb-0" id="roomTable">
             <thead class="bg-light">
                 <tr>
-                    <th class="ps-4 py-3 text-muted small text-uppercase fw-bold">Room</th>
+                    <th class="ps-4 py-3 text-muted small text-uppercase fw-bold">S.N.</th>
                     <th class="py-3 text-muted small text-uppercase fw-bold">Property</th>
                     <th class="py-3 text-muted small text-uppercase fw-bold">Rent</th>
                     <th class="py-3 text-muted small text-uppercase fw-bold">Capacity</th>
@@ -160,12 +160,7 @@
                 <tr class="room-row" data-name="{{ room.room_number|lower }}" data-property="{{ room.property.name|lower }}" 
                     data-status="{% if not room.is_active %}inactive{% elif room.is_occupied_calc %}occupied{% else %}vacant{% endif %}">
                     <td class="ps-4">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light p-2 rounded-2 me-3">
-                                <i class="fa-solid fa-hashtag text-muted small"></i>
-                            </div>
-                            <span class="fw-bold text-dark">{{ room.room_number }}</span>
-                        </div>
+                        <span class="text-muted small">{{ forloop.counter }}</span>
                     </td>
                     <td>
                         <span class="text-muted">{{ room.property.name }}</span>
