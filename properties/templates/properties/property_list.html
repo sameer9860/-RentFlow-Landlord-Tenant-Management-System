@@ -1,49 +1,267 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Properties - RentFlow{% endblock %}
 
+{% block extra_css %}
+<style>
+    .metric-card {
+        border: none;
+        border-radius: 16px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: linear-gradient(145deg, #ffffff, #f0f2f5);
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+    .property-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #fff;
+        height: 100%;
+    }
+    .property-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+    .progress-compact {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+    }
+    .search-container {
+        position: relative;
+    }
+    .search-container i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+    }
+    .search-input {
+        padding-left: 45px;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        height: 48px;
+        transition: all 0.3s;
+    }
+    .search-input:focus {
+        box-shadow: 0 0 0 4px rgba(54, 153, 255, 0.1);
+        border-color: #3699ff;
+    }
+    .badge-soft-primary { background-color: rgba(54, 153, 255, 0.1); color: #3699ff; }
+    .badge-soft-success { background-color: rgba(27, 197, 189, 0.1); color: #1bc5bd; }
+    .badge-soft-warning { background-color: rgba(255, 168, 0, 0.1); color: #ffa800; }
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">My Properties</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="{% url 'properties:property_add' %}" class="btn btn-sm btn-outline-primary"><i
-                class="fa-solid fa-plus me-1"></i>Add Property</a>
+<!-- Page Header -->
+<div class="row align-items-center mb-4">
+    <div class="col-md-6">
+        <h3 class="fw-bold mb-1">Properties Management</h3>
+        <p class="text-muted">Overview of your real estate portfolio</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a href="{% url 'properties:property_add' %}" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+            <i class="fa-solid fa-plus me-2"></i>Add New Property
+        </a>
     </div>
 </div>
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for property in properties %}
-    <div class="col">
-        <div class="card h-100 shadow-sm">
+<!-- Summary Stats -->
+<div class="row g-4 mb-5">
+    <div class="col-xl-3 col-md-6">
+        <div class="card metric-card shadow-sm h-100">
             <div class="card-body">
-                <h5 class="card-title">{{ property.name }}</h5>
-                <p class="card-text text-muted small"><i class="fa-solid fa-location-dot me-1"></i>{{ property.address  }}
-                </p>
-                <p class="card-text">{{ property.description|truncatewords:20 }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="badge bg-info text-dark">{{ property.rooms.count }} Rooms</span>
-                    <a href="{% url 'properties:room_list' %}?property={{ property.id }}"
-                        class="btn btn-sm btn-link">View Rooms</a>
+                <div class="card-icon badge-soft-primary">
+                    <i class="fa-solid fa-building fa-lg"></i>
+                </div>
+                <h6 class="text-muted mb-1">Total Properties</h6>
+                <h3 class="fw-bold mb-0">{{ total_properties }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card metric-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="card-icon badge-soft-warning">
+                    <i class="fa-solid fa-door-open fa-lg"></i>
+                </div>
+                <h6 class="text-muted mb-1">Total Rooms</h6>
+                <h3 class="fw-bold mb-0">{{ total_rooms }}</h3>
+                <small class="text-muted">{{ total_occupied }} Occupied</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card metric-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="card-icon badge-soft-success">
+                    <i class="fa-solid fa-chart-line fa-lg"></i>
+                </div>
+                <h6 class="text-muted mb-1">Occupancy Rate</h6>
+                <h3 class="fw-bold mb-0">{{ occupancy_rate }}%</h3>
+                <div class="progress progress-compact mt-2">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ occupancy_rate }}%"></div>
                 </div>
             </div>
-            <div class="card-footer bg-transparent border-top-0">
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card metric-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="card-icon badge-soft-primary">
+                    <i class="fa-solid fa-money-bill-trend-up fa-lg"></i>
+                </div>
+                <h6 class="text-muted mb-1">Current Monthly Rev.</h6>
+                <h3 class="fw-bold mb-0">Rs. {{ total_monthly_revenue }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filtering -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="propertySearch" class="form-control search-input shadow-sm"
+                placeholder="Search by property name or address...">
+        </div>
+    </div>
+</div>
+
+<!-- Properties Grid -->
+<div class="row g-4" id="propertyGrid">
+    {% for property in properties %}
+    <div class="col-md-6 col-xl-4 property-item" data-name="{{ property.name|lower }}"
+        data-address="{{ property.address|lower }}">
+        <div class="card property-card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-1">{{ property.name }}</h5>
+                        <p class="text-muted small mb-0"><i class="fa-solid fa-location-dot me-1"></i>{{ property.address }}</p>
+                    </div>
+                    <span class="badge {% if property.num_occupied == property.num_rooms and property.num_rooms > 0 %}badge-soft-success{% else %}badge-soft-primary{% endif %} rounded-pill">
+                        {% if property.num_occupied == property.num_rooms and property.num_rooms > 0 %}Full{% else %}Active{% endif %}
+                    </span>
+                </div>
+
+                <div class="row g-2 mb-4">
+                    <div class="col-6">
+                        <div class="p-2 border rounded-3 text-center">
+                            <small class="text-muted d-block">Occupancy</small>
+                            <span class="fw-bold">{{ property.num_occupied }}/{{ property.num_rooms }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 border rounded-3 text-center">
+                            <small class="text-muted d-block">Monthly Income</small>
+                            <span class="fw-bold">Rs. {{ property.total_actual_income|default:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">Occupancy Status</small>
+                        <small class="fw-bold">{% if property.num_rooms > 0 %}{% widthratio property.num_occupied property.num_rooms 100 %}{% else %}0{% endif %}%</small>
+                    </div>
+                    <div class="progress progress-compact">
+                        <div class="progress-bar bg-primary" role="progressbar"
+                            style="width: {% if property.num_rooms > 0 %}{% widthratio property.num_occupied property.num_rooms 100 %}{% else %}0{% endif %}%"></div>
+                    </div>
+                </div>
+
                 <div class="d-flex gap-2">
-                    <a href="{% url 'properties:property_edit' property.pk %}"
-                        class="btn btn-sm btn-outline-primary flex-fill">
-                        <i class="fa-solid fa-pen-to-square me-1"></i>Edit
+                    <a href="{% url 'properties:room_list' %}?property={{ property.id }}"
+                        class="btn btn-outline-primary flex-fill rounded-3 py-2">
+                        <i class="fa-solid fa-door-open me-1"></i>Rooms
                     </a>
-                    <a href="{% url 'properties:property_delete' property.pk %}"
-                        class="btn btn-sm btn-outline-danger flex-fill">
-                        <i class="fa-solid fa-trash me-1"></i>Delete
-                    </a>
+                    <div class="dropdown flex-fill">
+                        <button class="btn btn-light w-100 rounded-3 py-2 border" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li><a class="dropdown-item" href="{% url 'properties:property_edit' property.pk %}">
+                                    <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'properties:property_delete' property.pk %}">
+                                    <i class="fa-solid fa-trash me-2"></i>Delete Property</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     {% empty %}
-    <div class="col-12">
-        <div class="alert alert-warning">No properties found. <a href="#">Create your first property!</a></div>
+    <div class="col-12 text-center py-5">
+        <div class="mb-4">
+            <i class="fa-solid fa-building-circle-exclamation fa-4x text-muted opacity-25"></i>
+        </div>
+        <h4>No Properties Found</h4>
+        <p class="text-muted">Start by adding your first property to manage your tenants and rooms.</p>
+        <a href="{% url 'properties:property_add' %}" class="btn btn-primary px-4 mt-2">Add Property</a>
     </div>
     {% endfor %}
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('propertySearch');
+        const propertyItems = document.querySelectorAll('.property-item');
+        const propertyGrid = document.getElementById('propertyGrid');
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            propertyItems.forEach(item => {
+                const name = item.getAttribute('data-name');
+                const address = item.getAttribute('data-address');
+
+                if (name.includes(query) || address.includes(query)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Handle no results
+            const noResultsRow = document.getElementById('noResultsMsg');
+            if (visibleCount === 0 && query !== '') {
+                if (!noResultsRow) {
+                    const msg = document.createElement('div');
+                    msg.id = 'noResultsMsg';
+                    msg.className = 'col-12 text-center py-5';
+                    msg.innerHTML = '<p class="text-muted">No properties match your search criteria.</p>';
+                    propertyGrid.appendChild(msg);
+                }
+            } else if (noResultsRow) {
+                noResultsRow.remove();
+            }
+        });
+    });
+</script>
 {% endblock %}
