@@ -171,7 +171,25 @@ class TenancyListView(LandlordRequiredMixin, ListView):
     context_object_name = 'tenancies'
 
     def get_queryset(self):
-        return Tenancy.objects.filter(room__property__landlord=self.request.user).select_related('tenant', 'room__property')
+        return Tenancy.objects.filter(
+            room__property__landlord=self.request.user
+        ).select_related('tenant', 'room__property').order_by('-is_active', 'tenant__username')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tenancies = self.get_queryset()
+        
+        # Summary statistics
+        total_tenants = tenancies.values('tenant').distinct().count()
+        active_tenancies = tenancies.filter(is_active=True).count()
+        inactive_tenancies = tenancies.filter(is_active=False).count()
+        
+        context.update({
+            'total_tenants': total_tenants,
+            'active_tenancies': active_tenancies,
+            'inactive_tenancies': inactive_tenancies,
+        })
+        return context
 
 class TenancyCreateView(LandlordRequiredMixin, CreateView):
     model = Tenancy
