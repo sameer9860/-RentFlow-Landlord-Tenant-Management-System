@@ -2,94 +2,277 @@
 
 {% block title %}Invoices - RentFlow{% endblock %}
 
+{% block extra_css %}
+<style>
+    .metric-card {
+        border: none;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+        background: #fff;
+    }
+    .metric-card:hover {
+        transform: translateY(-3px);
+    }
+    .search-container {
+        position: relative;
+    }
+    .search-container i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+    }
+    .search-input {
+        padding-left: 45px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        height: 42px;
+    }
+    .filter-btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+    }
+    .filter-btn.active {
+        background: #3699ff;
+        color: #fff;
+        border-color: #3699ff;
+    }
+    .table-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .invoice-row {
+        transition: background-color 0.2s;
+    }
+    .badge-status {
+        width: 100px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Invoices</h1>
-    {% if user.profile.role == 'LANDLORD' %}
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <form action="{% url 'payments:generate_invoices' %}" method="post" class="me-2">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-sm btn-primary"><i class="fa-solid fa-rotate me-1"></i>Generate
-                Invoices</button>
-        </form>
+<div class="row align-items-center mb-4">
+    <div class="col-md-6">
+        <h3 class="fw-bold mb-1">Financial Overview</h3>
+        <p class="text-muted">Manage and track your rental payments</p>
     </div>
-    {% endif %}
+    <div class="col-md-6 text-md-end">
+        {% if user.profile.role == 'LANDLORD' %}
+        <form action="{% url 'payments:generate_invoices' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                <i class="fa-solid fa-rotate me-2"></i>Generate Invoices
+            </button>
+        </form>
+        {% endif %}
+    </div>
 </div>
 
-<div class="bg-white p-3 rounded shadow-sm">
+<!-- Summary Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card metric-card shadow-sm">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light-primary p-3 rounded-3 me-3">
+                        <i class="fa-solid fa-file-invoice-dollar text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Total Invoiced</h6>
+                        <h4 class="fw-bold mb-0">Rs. {{ total_invoiced }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card metric-card shadow-sm">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light-success p-3 rounded-3 me-3">
+                        <i class="fa-solid fa-circle-check text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Total Paid</h6>
+                        <h4 class="fw-bold mb-0">Rs. {{ total_paid }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card metric-card shadow-sm">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light-warning p-3 rounded-3 me-3">
+                        <i class="fa-solid fa-clock-rotate-left text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Outstanding</h6>
+                        <h4 class="fw-bold mb-0">Rs. {{ total_due }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body p-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-5 col-md-12">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="invoiceSearch" class="form-control search-input"
+                        placeholder="Search by {% if user.profile.role == 'LANDLORD' %}tenant{% else %}invoice{% endif %}, month, or year...">
+                </div>
+            </div>
+            <div class="col-lg-7 col-md-12 text-md-end">
+                <div class="d-flex gap-2 justify-content-lg-end overflow-auto pb-1 pb-lg-0">
+                    <button class="filter-btn active" data-status="all">All</button>
+                    <button class="filter-btn" data-status="paid">Paid</button>
+                    <button class="filter-btn" data-status="pending">Pending</button>
+                    <button class="filter-btn" data-status="awaiting">Awaiting</button>
+                    <button class="filter-btn" data-status="late">Late</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card table-card shadow-sm">
     <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
+        <table class="table table-hover align-middle mb-0" id="invoiceTable">
+            <thead class="bg-light">
                 <tr>
-                    <th>S.N.</th>
-                    <th>{% if user.profile.role == 'LANDLORD' %}Tenant{% else %}Room{% endif %}</th>
-                    <th>Month/Year</th>
-                    <th>Amount</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th class="ps-4 py-3 text-muted small text-uppercase fw-bold">S.N.</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">{% if user.profile.role == 'LANDLORD' %}Tenant{% else %}Property & Room{% endif %}</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Period</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Amount</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Status</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold text-end pe-4">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for invoice in invoices %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
+                <tr class="invoice-row" 
+                    data-search="{% if user.profile.role == 'LANDLORD' %}{{ invoice.tenancy.tenant.username|lower }}{% else %}{{ invoice.tenancy.room.property.name|lower }}{% endif %} {{ invoice.month }} {{ invoice.year }}" 
+                    data-status="{{ invoice.status|lower }}">
+                    <td class="ps-4 text-muted small">
+                        {{ forloop.counter }}
+                    </td>
                     <td>
                         {% if user.profile.role == 'LANDLORD' %}
-                        {{ invoice.tenancy.tenant.username }}
+                        <div class="fw-medium text-dark">{{ invoice.tenancy.tenant.username }}</div>
+                        <div class="text-muted small">{{ invoice.tenancy.room.property.name }} - {{ invoice.tenancy.room.room_number }}</div>
                         {% else %}
-                        {{ invoice.tenancy.room.room_number }}
+                        <div class="fw-medium text-dark">{{ invoice.tenancy.room.property.name }}</div>
+                        <div class="text-muted small">Room {{ invoice.tenancy.room.room_number }}</div>
                         {% endif %}
                     </td>
-                    <td>{{ invoice.month }}/{{ invoice.year }}</td>
-                    <td>NPR {{ invoice.amount }}</td>
-                    <td>{{ invoice.due_date }}</td>
+                    <td>
+                        <span class="badge bg-light text-dark border rounded-pill px-3">
+                            {{ invoice.month }}/{{ invoice.year }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="fw-bold text-dark">Rs. {{ invoice.amount }}</span>
+                    </td>
                     <td>
                         {% if invoice.status == 'PAID' %}
-                        <span class="badge bg-success">Paid</span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 badge-status">Paid</span>
                         {% elif invoice.status == 'AWAITING' %}
-                        <span class="badge bg-info text-dark">Awaiting Confirmation</span>
+                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3 py-2 badge-status">Awaiting</span>
                         {% elif invoice.status == 'LATE' %}
-                        <span class="badge bg-danger">Late</span>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2 badge-status">Late</span>
                         {% else %}
-                        <span class="badge bg-warning text-dark">Pending</span>
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2 badge-status">Pending</span>
                         {% endif %}
                     </td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{% url 'payments:invoice_detail' invoice.pk %}" class="btn btn-outline-info"
-                                title="View">
-                                <i class="fa-solid fa-eye"></i>
+                    <td class="text-end pe-4">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'payments:invoice_detail' invoice.pk %}" class="btn btn-sm btn-light border" title="View Details">
+                                <i class="fa-solid fa-eye text-primary"></i>
                             </a>
-                            {% if user.profile.role == 'LANDLORD' %}
-                                {% if invoice.status == 'AWAITING' %}
-                                <form action="{% url 'payments:mark_paid' invoice.pk %}" method="post" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-success btn-sm" title="Confirm Payment">
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
+                            {% if user.profile.role == 'LANDLORD' and invoice.status == 'AWAITING' %}
+                            <form action="{% url 'payments:mark_paid' invoice.pk %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success-subtle text-success border border-success-subtle" title="Confirm Payment">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </form>
                             {% endif %}
-                            {% if user.profile.role == 'TENANT' %}
-                                {% if invoice.status == 'PENDING' %}
-                                <a href="{% url 'payments:invoice_detail' invoice.pk %}" class="btn btn-success btn-sm" title="Pay Now">
-                                    <i class="fa-solid fa-credit-card me-1"></i>Pay
-                                </a>
-                                {% elif invoice.status == 'AWAITING' %}
-                                <span class="text-secondary small">Awaiting confirmation</span>
-                                {% endif %}
+                            {% if user.profile.role == 'TENANT' and invoice.status == 'PENDING' %}
+                            <a href="{% url 'payments:invoice_detail' invoice.pk %}" class="btn btn-sm btn-primary">
+                                Pay
+                            </a>
                             {% endif %}
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center py-4 text-muted">No invoices found.</td>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-receipt fa-3x text-muted opacity-25"></i>
+                        </div>
+                        <p class="text-muted">No invoices found.</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('invoiceSearch');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const invoiceRows = document.querySelectorAll('.invoice-row');
+
+        let currentSearch = '';
+        let currentStatus = 'all';
+
+        function updateFilters() {
+            invoiceRows.forEach(row => {
+                const searchText = row.getAttribute('data-search');
+                const status = row.getAttribute('data-status');
+
+                const matchesSearch = searchText.includes(currentSearch);
+                const matchesStatus = currentStatus === 'all' || status === currentStatus;
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', function () {
+            currentSearch = this.value.toLowerCase().trim();
+            updateFilters();
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentStatus = this.getAttribute('data-status');
+                updateFilters();
+            });
+        });
+    });
+</script>
 {% endblock %}
