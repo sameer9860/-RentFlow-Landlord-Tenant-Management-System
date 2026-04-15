@@ -40,6 +40,22 @@ class InvoiceListView(ProfileRequiredMixin, ListView):
         else:
             return qs.filter(tenancy__tenant=user).order_by('-year', '-month')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        invoices = self.get_queryset()
+        
+        # Financial summary metrics
+        total_invoiced = invoices.aggregate(total=Sum('amount'))['total'] or 0
+        total_paid = invoices.filter(status='PAID').aggregate(total=Sum('amount'))['total'] or 0
+        total_due = invoices.filter(status__in=['PENDING', 'LATE', 'AWAITING']).aggregate(total=Sum('amount'))['total'] or 0
+        
+        context.update({
+            'total_invoiced': total_invoiced,
+            'total_paid': total_paid,
+            'total_due': total_due,
+        })
+        return context
+
 class GenerateInvoicesView(LandlordRequiredMixin, View):
     def _generate(self, request):
         today = timezone.now().date()
