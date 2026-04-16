@@ -170,6 +170,37 @@ class ExpenseListView(LandlordRequiredMixin, ListView):
     def get_queryset(self):
         return Expense.objects.filter(landlord=self.request.user).order_by('-date')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        expenses = self.get_queryset()
+        
+        # Financial summary metrics
+        total_expense = expenses.aggregate(total=Sum('amount'))['total'] or 0
+        
+        # This month's expenses
+        now = timezone.now()
+        this_month_expense = expenses.filter(
+            date__month=now.month, 
+            date__year=now.year
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        # Top category by spending
+        top_category_data = expenses.values('category').annotate(
+            total=Sum('amount')
+        ).order_by('-total').first()
+        
+        top_category = None
+        if top_category_data:
+            # Get the display name for the category choice
+            top_category = dict(Expense.CATEGORY_CHOICES).get(top_category_data['category'])
+
+        context.update({
+            'total_expense': total_expense,
+            'this_month_expense': this_month_expense,
+            'top_category': top_category,
+        })
+        return context
+
 class ExpenseCreateView(LandlordRequiredMixin, CreateView):
     model = Expense
     form_class = ExpenseForm
