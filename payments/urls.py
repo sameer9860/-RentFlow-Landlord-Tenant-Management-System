@@ -2,8 +2,8 @@ from django.urls import path
 from .views import (
     InvoiceListView, GenerateInvoicesView, MarkInvoicePaidView, 
     InvoiceDetailView, ProcessPaymentView,
-    ExpenseListView, ExpenseCreateView, FinancialReportView,
-    ExportReportPDFView, ExportReportCSVView
+    ExpenseListView, ExpenseCreateView, ExpenseUpdateView, ExpenseDeleteView,
+    FinancialReportView, ExportReportPDFView, ExportReportCSVView
 )
 
 app_name = 'payments'
@@ -18,6 +18,8 @@ urlpatterns = [
     # Expenses
     path('expenses/', ExpenseListView.as_view(), name='expense_list'),
     path('expenses/add/', ExpenseCreateView.as_view(), name='expense_create'),
+    path('expenses/<int:pk>/edit/', ExpenseUpdateView.as_view(), name='expense_edit'),
+    path('expenses/<int:pk>/delete/', ExpenseDeleteView.as_view(), name='expense_delete'),
     
     # Reports
     path('reports/monthly/', FinancialReportView.as_view(), name='financial_report'),

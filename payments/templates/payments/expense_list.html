@@ -150,7 +150,8 @@
                     <th class="py-3 text-muted small text-uppercase fw-bold">Date</th>
                     <th class="py-3 text-muted small text-uppercase fw-bold">Category</th>
                     <th class="py-3 text-muted small text-uppercase fw-bold">Description</th>
-                    <th class="py-3 text-muted small text-uppercase fw-bold text-end pe-4">Amount</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold">Amount</th>
+                    <th class="py-3 text-muted small text-uppercase fw-bold text-end pe-4">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -171,8 +172,22 @@
                     <td>
                         <div class="text-dark small">{{ expense.description|default:"No description provided" }}</div>
                     </td>
-                    <td class="text-end pe-4 fw-bold text-dark">
+                    <td class="fw-bold text-dark">
                         Rs. {{ expense.amount }}
+                    </td>
+                    <td class="text-end pe-4">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light rounded-2 border" type="button" data-bs-toggle="dropdown">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <li><a class="dropdown-item" href="{% url 'payments:expense_edit' expense.pk %}">
+                                    <i class="fa-solid fa-pen-to-square me-2 small"></i>Edit Expense</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'payments:expense_delete' expense.pk %}">
+                                    <i class="fa-solid fa-trash me-2 small"></i>Delete</a></li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}

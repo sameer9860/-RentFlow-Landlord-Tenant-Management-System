@@ -10,7 +10,7 @@ from properties.models import Tenancy
 from .models import RentInvoice, Payment, Expense
 from .forms import PaymentForm, ExpenseForm
 from django.db.models import Sum, Count
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 import io
@@ -210,6 +210,31 @@ class ExpenseCreateView(LandlordRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.landlord = self.request.user
         messages.success(self.request, "Expense added successfully!")
+        return super().form_valid(form)
+
+class ExpenseUpdateView(LandlordRequiredMixin, UpdateView):
+    model = Expense
+    form_class = ExpenseForm
+    template_name = 'payments/expense_form.html'
+    success_url = reverse_lazy('payments:expense_list')
+
+    def get_queryset(self):
+        return Expense.objects.filter(landlord=self.request.user)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Expense updated successfully!")
+        return super().form_valid(form)
+
+class ExpenseDeleteView(LandlordRequiredMixin, DeleteView):
+    model = Expense
+    template_name = 'payments/expense_confirm_delete.html'
+    success_url = reverse_lazy('payments:expense_list')
+
+    def get_queryset(self):
+        return Expense.objects.filter(landlord=self.request.user)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Expense deleted successfully!")
         return super().form_valid(form)
 
 class FinancialReportView(LandlordRequiredMixin, ListView):
