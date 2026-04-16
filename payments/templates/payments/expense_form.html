@@ -1,36 +1,136 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Add Expense - RentFlow{% endblock %}
+{% block title %}Record Expense - RentFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .form-header {
+        background: linear-gradient(135deg, #3699ff 0%, #0056b3 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+    }
+    .form-header i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+    .form-label i {
+        margin-right: 8px;
+        color: #3699ff;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 1px solid #e0e6ed;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #3699ff;
+        box-shadow: 0 0 0 4px rgba(54, 153, 255, 0.1);
+    }
+    .btn-save {
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        transition: transform 0.2s;
+    }
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(54, 153, 255, 0.4);
+    }
+    .btn-cancel {
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 600;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border: 1px solid #e0e6ed;
+    }
+    .btn-cancel:hover {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 fw-bold">Add New Expense</h5>
+<div class="row justify-content-center py-5">
+    <div class="col-lg-6 col-md-8">
+        <div class="card form-card shadow-lg border-0">
+            <div class="form-header">
+                <i class="fa-solid fa-receipt"></i>
+                <h3 class="fw-bold mb-1">Record Expense</h3>
+                <p class="mb-0 opacity-75">Track property maintenance and overhead costs</p>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5 bg-white">
                 <form method="post" novalidate>
                     {% csrf_token %}
 
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label fw-bold small text-muted">
-                            {{ field.label }}
+                    <div class="mb-4">
+                        <label for="{{ form.category.id_for_label }}" class="form-label">
+                            <i class="fa-solid fa-tags text-primary"></i> Category
                         </label>
-                        {{ field }}
-                        {% if field.errors %}
-                        <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <div class="text-danger small mt-2">
+                            {% for error in form.category.errors %}{{ error }}{% endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    {% endfor %}
 
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary py-2 fw-bold">
-                            Save Expense
+                    <div class="mb-4">
+                        <label for="{{ form.amount.id_for_label }}" class="form-label">
+                            <i class="fa-solid fa-wallet text-success"></i> Amount (Rs.)
+                        </label>
+                        {{ form.amount }}
+                        {% if form.amount.errors %}
+                        <div class="text-danger small mt-2">
+                            {% for error in form.amount.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">
+                            <i class="fa-solid fa-align-left text-info"></i> Description
+                        </label>
+                        {{ form.description }}
+                        <div class="form-text text-muted small mt-2">
+                            Briefly explain what this expense was for.
+                        </div>
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-2">
+                            {% for error in form.description.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="submit" class="btn btn-primary btn-save shadow-sm py-3">
+                            <i class="fa-solid fa-check-circle me-2"></i>Save Expense Record
                         </button>
+                        <a href="{% url 'payments:expense_list' %}" class="btn btn-cancel py-3">
+                            Cancel and Go Back
+                        </a>
                     </div>
                 </form>
+            </div>
+            <div class="card-footer bg-light py-3 border-0 text-center">
+                <small class="text-muted italic">All expenses are recorded in your permanent financial history.</small>
             </div>
         </div>
     </div>
