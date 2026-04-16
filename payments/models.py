@@ -22,6 +22,8 @@ class RentInvoice(models.Model):
     def __str__(self):
         return f"Invoice #{self.id} for {self.tenancy} - {self.month}/{self.year}"
 
+from django.utils import timezone
+
 class Expense(models.Model):
     CATEGORY_CHOICES = (
         ('MAINTENANCE', 'Maintenance'),
@@ -34,7 +36,7 @@ class Expense(models.Model):
     landlord = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=timezone.now)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
