@@ -1,38 +1,89 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Add Room - RentFlow{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Room - RentFlow{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div
-            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Add New Room</h1>
-            <a href="{% url 'properties:room_list' %}" class="btn btn-sm btn-outline-secondary">Back to List</a>
+<div class="row justify-content-center animate-fade-in-up">
+    <div class="col-lg-10 col-xl-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="h3 mb-0 text-gray-800">{% if form.instance.pk %}Edit Unit Configuration{% else %}Create New Rental Unit{% endif %}</h2>
+                <p class="text-muted small">Manage the technical specifications and availability of this property unit.</p>
+            </div>
+            <a href="{% url 'properties:room_list' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="fa-solid fa-arrow-left me-1"></i> Return to List
+            </a>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
+        <div class="card form-card">
+            <div class="card-body p-4 p-md-5">
                 <form method="post" novalidate>
                     {% csrf_token %}
-
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                        <div class="form-text text-muted small">{{ field.help_text }}</div>
-                        {% endif %}
-                        {% if field.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ field.errors|striptags }}
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6 animate-fade-in-up delay-1">
+                            <label for="{{ form.property.id_for_label }}" class="form-label fw-bold">Parent Property</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-building-user text-primary"></i></span>
+                                {{ form.property }}
+                            </div>
+                            {% if form.property.errors %}
+                            <div class="text-danger small mt-1">{{ form.property.errors.0 }}</div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <button type="submit" class="btn btn-primary px-4">Save Room</button>
+                        <div class="col-md-6 animate-fade-in-up delay-1">
+                            <label for="{{ form.room_number.id_for_label }}" class="form-label fw-bold">Room / Flat Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-door-open text-primary"></i></span>
+                                {{ form.room_number }}
+                            </div>
+                            {% if form.room_number.errors %}
+                            <div class="text-danger small mt-1">{{ form.room_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 animate-fade-in-up delay-2">
+                            <label for="{{ form.monthly_rent.id_for_label }}" class="form-label fw-bold">Standard Monthly Rent</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-dollar-sign text-success"></i></span>
+                                {{ form.monthly_rent }}
+                            </div>
+                            {% if form.monthly_rent.errors %}
+                            <div class="text-danger small mt-1">{{ form.monthly_rent.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 animate-fade-in-up delay-2">
+                            <label for="{{ form.capacity.id_for_label }}" class="form-label fw-bold">Occupancy Capacity</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-users text-info"></i></span>
+                                {{ form.capacity }}
+                            </div>
+                            {% if form.capacity.errors %}
+                            <div class="text-danger small mt-1">{{ form.capacity.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 animate-fade-in-up delay-3">
+                            <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Active Inventory</h6>
+                                    <small class="text-muted">Currently available for listing and tenancy assignments</small>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    {{ form.is_active }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5">
+                        <a href="{% url 'properties:room_list' %}" class="btn btn-light px-4 rounded-pill">Cancel Changes</a>
+                        <button type="submit" class="btn btn-premium px-5 rounded-pill">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> 
+                            {% if form.instance.pk %}Update Record{% else %}Save Configuration{% endif %}
+                        </button>
                     </div>
                 </form>
             </div>
