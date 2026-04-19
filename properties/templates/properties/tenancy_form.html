@@ -1,125 +1,163 @@
 {% extends 'core/base.html' %}
 
-{% block title %}{% if form.instance.pk %}Edit Tenancy{% else %}Add Tenancy{% endif %} - RentFlow{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Tenancy - RentFlow{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">{% if form.instance.pk %}Edit Tenancy{% else %}Add Tenancy{% endif %}</h1>
-    <a href="{% url 'properties:tenancy_list' %}" class="btn btn-sm btn-outline-secondary">
-        <i class="fa-solid fa-arrow-left me-1"></i>Back to Tenants
-    </a>
-</div>
+<div class="row justify-content-center animate-fade-in-up">
+    <div class="col-lg-10 col-xl-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="h3 mb-0 text-gray-800">{% if form.instance.pk %}Edit Tenancy Agreement{% else %}New Tenant Enrollment{% endif %}</h2>
+                <p class="text-muted small">Establish a new rental agreement and set up tenant credentials.</p>
+            </div>
+            <a href="{% url 'properties:tenancy_list' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Tenants
+            </a>
+        </div>
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-body">
+        <div class="card form-card">
+            <div class="card-body p-4 p-md-5">
                 <form method="post" novalidate>
                     {% csrf_token %}
-
+                    
                     {% if not form.instance.pk %}
-                    <h6 class="mb-3 text-primary fw-bold">1. Tenant Account Details</h6>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.tenant_username.id_for_label }}"
-                                class="form-label fw-bold small text-muted">Username *</label>
-                            {{ form.tenant_username }}
+                    <h5 class="mb-4 fw-bold text-primary animate-fade-in-up delay-1">
+                        <i class="fa-solid fa-user-plus me-2"></i>1. Tenant Account Details
+                    </h5>
+                    
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6 animate-fade-in-up delay-1">
+                            <label for="{{ form.tenant_username.id_for_label }}" class="form-label fw-bold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
+                                {{ form.tenant_username }}
+                            </div>
                             {% if form.tenant_username.errors %}
-                            <div class="text-danger small">{{ form.tenant_username.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.tenant_username.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.tenant_email.id_for_label }}"
-                                class="form-label fw-bold small text-muted">Email *</label>
-                            {{ form.tenant_email }}
+
+                        <div class="col-md-6 animate-fade-in-up delay-1">
+                            <label for="{{ form.tenant_email.id_for_label }}" class="form-label fw-bold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                {{ form.tenant_email }}
+                            </div>
                             {% if form.tenant_email.errors %}
-                            <div class="text-danger small">{{ form.tenant_email.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.tenant_email.errors.0 }}</div>
                             {% endif %}
                         </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.tenant_phone.id_for_label }}"
-                                class="form-label fw-bold small text-muted">Phone Number *</label>
-                            {{ form.tenant_phone }}
+                        <div class="col-md-6 animate-fade-in-up delay-2">
+                            <label for="{{ form.tenant_phone.id_for_label }}" class="form-label fw-bold">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                                {{ form.tenant_phone }}
+                            </div>
                             {% if form.tenant_phone.errors %}
-                            <div class="text-danger small">{{ form.tenant_phone.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.tenant_phone.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.tenant_address.id_for_label }}"
-                                class="form-label fw-bold small text-muted">Address *</label>
-                            {{ form.tenant_address }}
+
+                        <div class="col-md-6 animate-fade-in-up delay-2">
+                            <label for="{{ form.tenant_address.id_for_label }}" class="form-label fw-bold">Home Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-location-dot text-muted"></i></span>
+                                {{ form.tenant_address }}
+                            </div>
                             {% if form.tenant_address.errors %}
-                            <div class="text-danger small">{{ form.tenant_address.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.tenant_address.errors.0 }}</div>
                             {% endif %}
                         </div>
-                    </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="{{ form.tenant_password.id_for_label }}"
-                                class="form-label fw-bold small text-muted">Initial Password *</label>
-                            {{ form.tenant_password }}
+                        <div class="col-md-6 animate-fade-in-up delay-3">
+                            <label for="{{ form.tenant_password.id_for_label }}" class="form-label fw-bold">Initial Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                                {{ form.tenant_password }}
+                                <button class="btn btn-outline-secondary border-start-0 toggle-password" type="button" data-target="{{ form.tenant_password.id_for_label }}">
+                                    <i class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
                             {% if form.tenant_password.errors %}
-                            <div class="text-danger small">{{ form.tenant_password.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.tenant_password.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.confirm_password.id_for_label }}"
-                                class="form-label fw-bold small text-muted">Confirm Password *</label>
-                            {{ form.confirm_password }}
+
+                        <div class="col-md-6 animate-fade-in-up delay-3">
+                            <label for="{{ form.confirm_password.id_for_label }}" class="form-label fw-bold">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-shield-halved text-muted"></i></span>
+                                {{ form.confirm_password }}
+                                <button class="btn btn-outline-secondary border-start-0 toggle-password" type="button" data-target="{{ form.confirm_password.id_for_label }}">
+                                    <i class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
                             {% if form.confirm_password.errors %}
-                            <div class="text-danger small">{{ form.confirm_password.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.confirm_password.errors.0 }}</div>
                             {% endif %}
                         </div>
                     </div>
-
-                    <hr class="my-4">
-                    <h6 class="mb-3 text-primary fw-bold">2. Rental Details</h6>
+                    
+                    <hr class="my-5 opacity-25">
                     {% endif %}
 
-                    <div class="mb-3">
-                        <label for="{{ form.room.id_for_label }}" class="form-label fw-bold small text-muted">Select
-                            Room *</label>
-                        {{ form.room }}
-                        {% if form.room.errors %}
-                        <div class="text-danger small">{{ form.room.errors }}</div>
-                        {% endif %}
-                    </div>
+                    <h5 class="mb-4 fw-bold text-primary animate-fade-in-up delay-4">
+                        <i class="fa-solid fa-file-contract me-2"></i>{% if form.instance.pk %}Agreement Updates{% else %}2. Lease Configuration{% endif %}
+                    </h5>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.start_date.id_for_label }}" class="form-label fw-bold">Start
-                                Date</label>
-                            {{ form.start_date }}
+                    <div class="row g-4">
+                        <div class="col-12 animate-fade-in-up delay-4">
+                            <label for="{{ form.room.id_for_label }}" class="form-label fw-bold">Assigned Unit</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-door-open text-primary"></i></span>
+                                {{ form.room }}
+                            </div>
+                            {% if form.room.errors %}
+                            <div class="text-danger small mt-1">{{ form.room.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 animate-fade-in-up delay-5">
+                            <label for="{{ form.start_date.id_for_label }}" class="form-label fw-bold">Lease Start Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-calendar-check text-success"></i></span>
+                                {{ form.start_date }}
+                            </div>
                             {% if form.start_date.errors %}
-                            <div class="text-danger small">{{ form.start_date.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.start_date.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.end_date.id_for_label }}" class="form-label fw-bold">End Date
-                                (Optional)</label>
-                            {{ form.end_date }}
+
+                        <div class="col-md-6 animate-fade-in-up delay-5">
+                            <label for="{{ form.end_date.id_for_label }}" class="form-label fw-bold">Lease End Date (Optional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-calendar-xmark text-danger"></i></span>
+                                {{ form.end_date }}
+                            </div>
                             {% if form.end_date.errors %}
-                            <div class="text-danger small">{{ form.end_date.errors }}</div>
+                            <div class="text-danger small mt-1">{{ form.end_date.errors.0 }}</div>
                             {% endif %}
+                        </div>
+
+                        <div class="col-12 animate-fade-in-up delay-6">
+                            <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Immediate Occupancy</h6>
+                                    <small class="text-muted">Set as active tenancy upon saving</small>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    {{ form.is_active }}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-4 form-check">
-                        {{ form.is_active }}
-                        <label for="{{ form.is_active.id_for_label }}" class="form-check-label fw-bold ms-1">Active
-                            Tenancy</label>
-                        {% if form.is_active.errors %}
-                        <div class="text-danger small">{{ form.is_active.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary py-2 fw-bold">
-                            <i class="fa-solid fa-save me-1"></i>Save Tenancy
+                    <div class="d-flex justify-content-end gap-3 mt-5">
+                        <a href="{% url 'properties:tenancy_list' %}" class="btn btn-light px-4 rounded-pill">Discard Changes</a>
+                        <button type="submit" class="btn btn-premium px-5 rounded-pill">
+                            <i class="fa-solid fa-check-circle me-2"></i> 
+                            {% if form.instance.pk %}Update Tenancy{% else %}Enroll Tenant{% endif %}
                         </button>
                     </div>
                 </form>
@@ -127,4 +165,29 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const togglers = document.querySelectorAll('.toggle-password');
+        togglers.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
