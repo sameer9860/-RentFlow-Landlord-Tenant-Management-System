@@ -1,4 +1,7 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+
+from .api import PropertyViewSet, RoomViewSet, TenancyViewSet
 from .views import (
     PropertyListView, PropertyCreateView, PropertyUpdateView, PropertyDeleteView,
     RoomListView, RoomCreateView, RoomUpdateView, RoomDeleteView,
@@ -6,6 +9,11 @@ from .views import (
 )
 
 app_name = 'properties'
+
+router = DefaultRouter()
+router.register(r'api/properties', PropertyViewSet, basename='property')
+router.register(r'api/rooms', RoomViewSet, basename='room')
+router.register(r'api/tenancies', TenancyViewSet, basename='tenancy')
 
 urlpatterns = [
     path('', PropertyListView.as_view(), name='property_list'),
@@ -20,4 +28,5 @@ urlpatterns = [
     path('tenancies/add/', TenancyCreateView.as_view(), name='tenancy_add'),
     path('tenancies/<int:pk>/edit/', TenancyUpdateView.as_view(), name='tenancy_edit'),
     path('tenancies/<int:pk>/delete/', TenancyDeleteView.as_view(), name='tenancy_delete'),
+    path('', include(router.urls)),
 ]
