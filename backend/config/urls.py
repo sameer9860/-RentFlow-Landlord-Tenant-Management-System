@@ -22,6 +22,7 @@ from accounts.views import DashboardRedirectView
 urlpatterns = [
     path('', DashboardRedirectView.as_view(), name='root_redirect'),
     path('admin/', admin.site.urls),
+    path('core/', include('core.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('properties/', include('properties.urls')),
     path('payments/', include('payments.urls')),
